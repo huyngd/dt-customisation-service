@@ -1,17 +1,16 @@
 const optionsData = [
-    { id: "option1", src: "opt1.png", alt: "Standard" },
-    { id: "option2", src: "opt2.png", alt: "Airport" },
-    { id: "option3", src: "opt3.png", alt: "Day pass" }
+    { id: "A", src: "images/opt1.png", alt: "A" },
+    { id: "B", src: "images/opt2.png", alt: "B" },
+    { id: "C", src: "images/opt3.png", alt: "C" }
 ];
 
 const scenarios = [
-    { id: "scenario1", leftImage: "10.png", rightImage: "11.png" },
-    { id: "scenario2", leftImage: "image6.png", rightImage: "image7.png" },
-    { id: "scenario3", leftImage: "image8.png", rightImage: "image9.png" },
-    { id: "scenario4", leftImage: "image5.png", rightImage: "image6.png" },
-    { id: "scenario5", leftImage: "12.png", rightImage: "13.png" },
-    { id: "scenario6", leftImage: "14.gif", rightImage: "15.gif" }
-    // Add other scenarios here
+    { id: "scenario1", leftImage: "images/10.png", rightImage: "images/11.png", key: "searchBar" },
+    { id: "scenario2", leftImage: "images/image6.png", rightImage: "images/image7.png", key: "tripTime" },
+    { id: "scenario3", leftImage: "images/image8.png", rightImage: "images/image9.png", key: "returnTrip" },
+    { id: "scenario4", leftImage: "images/image5.png", rightImage: "images/image6.png", key: "passengerType" },
+    { id: "scenario5", leftImage: "images/12.png", rightImage: "images/13.png", key: "fareClasses" },
+    { id: "scenario6", leftImage: "images/14.gif", rightImage: "images/15.gif", key: "seatSelection" }
 ];
 
 const optionsContainer = document.getElementById('options');
@@ -34,7 +33,7 @@ optionsData.forEach(option => {
     col.querySelector('img').addEventListener('click', () => {
         document.querySelectorAll('.option img').forEach(img => img.classList.remove('selected'));
         col.querySelector('img').classList.add('selected');
-        selectedOptionInput.value = option.id;
+        selectedOptionInput.value = option.id; // Store A, B, or C
     });
 });
 
@@ -44,16 +43,18 @@ scenarios.forEach((scenario, index) => {
 
     row.innerHTML = `
         <div class="col-md-4 text-center option" data-scenario="${scenario.id}" data-side="left">
-            <img src="${scenario.leftImage}" alt="Left Image ${index + 1}" class="img-fluid">
+            <img src="${scenario.leftImage}" alt="Image A ${index + 1}" class="img-fluid">
+            <p>A</p>
         </div>
         <div class="col-md-4 switch-container">
             <input type="checkbox" id="switch-${scenario.id}" class="form-check-input" checked>
             <label for="switch-${scenario.id}">
-                <span>Left</span>
+                <span>A</span>
             </label>
         </div>
         <div class="col-md-4 text-center option" data-scenario="${scenario.id}" data-side="right">
-            <img src="${scenario.rightImage}" alt="Right Image ${index + 1}" class="img-fluid">
+            <img src="${scenario.rightImage}" alt="Image B ${index + 1}" class="img-fluid">
+            <p>B</p>
         </div>
     `;
 
@@ -80,23 +81,23 @@ scenarios.forEach((scenario, index) => {
     const labelSpan = row.querySelector(`#switch-${scenario.id} + label span`);
 
     switchElement.addEventListener('change', () => {
-        labelSpan.textContent = switchElement.checked ? 'Left' : 'Right';
+        labelSpan.textContent = switchElement.checked ? 'A' : 'B';
     });
 });
 
 document.getElementById('selectionForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const scenarioResults = scenarios.map((scenario, index) => {
+    // Map scenario results to meaningful keys
+    const scenarioResults = scenarios.reduce((acc, scenario) => {
         const switchElement = document.getElementById(`switch-${scenario.id}`);
-        return {
-            switch_status: switchElement.checked ? 'LEFT' : 'RIGHT', // Map the toggle state
-        };
-    });
+        acc[scenario.key] = switchElement.checked ? 'A' : 'B'; // Map the toggle state to meaningful keys
+        return acc;
+    }, {});
 
     const data = {
-        selected_option: selectedOptionInput.value,
-        scenarios: scenarioResults, // Pass only the states
+        selected_option: selectedOptionInput.value, // A, B, or C
+        ...scenarioResults, // Spread the meaningful scenario results
     };
 
     try {

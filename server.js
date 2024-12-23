@@ -1,4 +1,3 @@
-// server.js
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -24,21 +23,20 @@ app.get('/', (req, res) => {
 // Save user selections to Supabase
 app.post('/save-selections', async (req, res) => {
     try {
-        const { selected_option, scenarios } = req.body;
+        const { selected_option, searchBar, tripTime, returnTrip, passengerType, fareClasses, seatSelection } = req.body;
 
-        // Transform scenarios into the desired structure
-        const scenarioStates = {};
-        scenarios.forEach((scenario, index) => {
-            scenarioStates[`scenario${index + 1}`] = scenario.switch_status; // "ON" or "OFF"
-        });
-
-        // Insert into the database
+        // Insert into the database with meaningful columns
         const { error } = await supabase
             .from('user_inputs')
             .insert({
-                selected_option: selected_option,
-                ...scenarioStates,
-                submitted_at: new Date().toISOString(),
+                pageSelection: selected_option, // A, B, or C
+                searchBar: searchBar,            // "A" or "B"
+                tripTime: tripTime,              // "A" or "B"
+                returnTrip: returnTrip,          // "A" or "B"
+                passengerType: passengerType,    // "A" or "B"
+                fareClasses: fareClasses,        // "A" or "B"
+                seatSelection: seatSelection,    // "A" or "B"
+                submittedAt: new Date().toISOString(), // Current timestamp
             });
 
         if (error) throw error;

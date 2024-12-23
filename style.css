@@ -66,7 +66,7 @@
 
 /* Position for default (Right) */
 .switch-container input[type="checkbox"] + label span {
-    left: 36px; /* Position on the right end */
+    left: 52px; /* Position on the right end */
     color: black; /* Default for "Right" */
 }
 
