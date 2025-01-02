@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2 class="text-center mb-4">What do you want your demo page to look like?</h2>
+        <!-- <h2 class="text-center mb-4">Welcome!</h2> -->
         <form id="selectionForm" class="text-center">
             <div class="row justify-content-center" id="options">
                 <!-- Options will be dynamically added here -->
@@ -17,8 +17,10 @@
             <div id="dynamicGrid" class="row g-3">
                 <!-- New dynamic grid for ON/OFF switches will be populated here -->
             </div>            
-            <input type="hidden" id="selectedOption" name="selectedOption">
-            <button type="submit" class="btn btn-primary mt-4">Submit</button>
+            <div id="dynamicForm" class="container mt-5">
+                <!-- Dynamic modules will be rendered here -->
+            </div>
+            
         </form>
     </div>
     <script src="index.js"></script>
