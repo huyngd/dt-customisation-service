@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 const optionsData = [
     { id: "A", src: "images/opt1.png", alt: "A. Standard WL page" },
     { id: "B", src: "images/opt2.png", alt: "B. Airport transfers page" },
@@ -5,13 +8,52 @@ const optionsData = [
 ];
 
 const scenarios = [
-    { id: "scenario1", leftImage: "images/10.png", rightImage: "images/11.png", key: "searchBar", leftDescription: "Row search bar", rightDescription: "Column search bar"},
-    { id: "scenario2", leftImage: "images/image6.png", rightImage: "images/image7.png", key: "tripTime", leftDescription: "Trip time enabled", rightDescription: "Trip time disabled"},
-    { id: "scenario3", leftImage: "images/image8.png", rightImage: "images/image9.png", key: "returnTrip", leftDescription: "Return trip enabled", rightDescription: "Return trip disabled"},
-    { id: "scenario4", leftImage: "images/image5.png", rightImage: "images/image6.png", key: "passengerType", leftDescription: "Passenger type enabled", rightDescription: "Passenger type disabled"},
-    { id: "scenario5", leftImage: "images/12.png", rightImage: "images/13.png", key: "fareClasses", leftDescription: "Fare classes displayed on search results", rightDescription: "Fare classes displayed at checkout"},
-    { id: "scenario6", leftImage: "images/14.gif", rightImage: "images/15.gif", key: "seatSelection", leftDescription: "Seat selection displayed on search results", rightDescription: "Seat selection displayed at checkout"}
+    {
+        id: "scenario1",
+        key: "searchBar",
+        options: ["Row search bar", "Column search bar"],
+        images: ["images/10.png", "images/11.png"]
+    },
+    {
+        id: "scenario2",
+        key: "tripTime",
+        options: ["Enabled", "Disabled"],
+        images: ["images/image6.png", "images/image7.png"]
+    },
+    {
+        id: "scenario3",
+        key: "returnTrip",
+        options: ["Enabled", "Disabled"],
+        images: ["images/image8.png", "images/image9.png"]
+    },
+    {
+        id: "scenario4",
+        key: "passengerType",
+        options: ["Enabled", "Disabled"],
+        images: ["images/image5.png", "images/image4.png"]
+    },
+    {
+        id: "scenario5",
+        key: "fareClasses",
+        options: ["Search results", "Checkout", "Nowhere"],
+        images: ["images/12.png", "images/13.png", "images/13.png"]
+    },
+    {
+        id: "scenario6",
+        key: "seatSelection",
+        options: ["Search results", "Checkout", "No seat selection"],
+        images: ["images/14.gif", "images/15.gif", "images/15.gif"]
+    },
+    {
+        id: "scenario7",
+        key: "customScenario",
+        options: ["Image & Input"],
+        description: "Enter your custom configuration:",
+        inputBox: true, // Enable input box for this scenario
+        images: ["images/11.png"]
+    }
 ];
+
 
 const optionsContainer = document.getElementById('options');
 const dynamicGrid = document.getElementById('dynamicGrid');
@@ -134,7 +176,7 @@ function renderUpdateConfigurationForm() {
                 <label for="changes" class="form-label">What changes do you want to make?</label>
                 <textarea class="form-control" id="changes" rows="4" placeholder="Describe the changes" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary mt-3">Submit</button>
         </form>
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
     `;
@@ -193,107 +235,83 @@ function renderTailoredQuestions(selectedLandingPage) {
     historyStack.push(() => renderTailoredQuestions(selectedLandingPage));
     const container = document.getElementById('dynamicForm');
 
-    let questionsHTML = '';
-    switch (selectedLandingPage) {
-        case 'A': // Standard
-            questionsHTML = `
-                <div class="mb-3">
-                    <label for="standard-feature" class="form-label">Provide any additional notes for the standard page:</label>
-                    <textarea class="form-control" id="standard-feature" placeholder="Add any notes or features"></textarea>
+    const scenariosHTML = scenarios.map((scenario, index) => {
+        if (scenario.options.length === 1) {
+            // For single-option scenarios, display the image and text without a radio button
+            return `
+            <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
+                <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
+                <div class="text-center">
+                    <img src="${scenario.images[0]}" alt="${scenario.options[0]}" class="img-fluid scenario-img" />
+                    <p class="mt-2"><strong>${scenario.options[0]}</strong></p>
                 </div>
-            `;
-            break;
-        case 'B': // Airport Transfer
-            questionsHTML = `
-                <div class="mb-3">
-                    <label for="airport-notes" class="form-label">Provide any additional notes for the airport transfer page:</label>
-                    <textarea class="form-control" id="airport-notes" placeholder="Add any notes or features"></textarea>
-                </div>
-            `;
-            break;
-        case 'C': // Public Transportation
-            questionsHTML = `
-                <div class="mb-3">
-                    <label for="public-area" class="form-label">Provide any additional notes for the public transportation page:</label>
-                    <textarea class="form-control" id="public-area" placeholder="Add any notes or features"></textarea>
-                </div>
-            `;
-            break;
-        default:
-            questionsHTML = `<p>No tailored questions available for this option.</p>`;
-    }
+                ${
+                    scenario.inputBox
+                        ? `<div class="mt-3">
+                            <label for="customInput-${index}" class="form-label">${scenario.description}</label>
+                            <input type="text" class="form-control" id="customInput-${index}" placeholder="Enter your value">
+                           </div>`
+                        : ""
+                }
+            </div>`;
+        }
 
-    const scenariosHTML = scenarios
-        .map(
-            (scenario, index) => `
-        <div class="rounded p-3 mb-3" style="border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-            <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, '$1').trim()}</h5>
-            <div class="row align-items-center">
-                <div class="col-md-4 text-center">
-                    <img src="${scenario.leftImage}" alt="Scenario Left ${index + 1}" class="img-fluid scenario-img" data-scenario="${scenario.id}" data-side="left">
-                    <p><strong>A:</strong> ${scenario.leftDescription}</p>
-                </div>
-                <div class="col-md-4 switch-container text-center">
-                    <input type="checkbox" id="switch-${scenario.id}" class="form-check-input" checked>
-                    <label for="switch-${scenario.id}" class="d-block">
-                        <span>A</span>
+        // For multiple options, display radio buttons with images and text
+        const optionsHTML = scenario.options.map(
+            (option, i) => `
+            <div class="col-md-4 text-center option-container">
+                <img src="${scenario.images[i]}" alt="${option}" class="img-fluid scenario-img" />
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="radio" name="scenario-${index}" id="option-${index}-${i}" value="${option}" ${i === 0 ? "checked" : ""}>
+                    <label class="form-check-label d-block" for="option-${index}-${i}">
+                        ${option}
                     </label>
                 </div>
-                <div class="col-md-4 text-center">
-                    <img src="${scenario.rightImage}" alt="Scenario Right ${index + 1}" class="img-fluid scenario-img" data-scenario="${scenario.id}" data-side="right">
-                    <p><strong>B:</strong> ${scenario.rightDescription}</p>
-                </div>
+            </div>`
+        ).join("");
+
+        return `
+        <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
+            <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
+            <div class="row justify-content-center">
+                ${optionsHTML}
             </div>
-        </div>
-    `
-        )
-        .join('');
+            ${
+                scenario.inputBox
+                    ? `<div class="mt-3">
+                            <label for="customInput-${index}" class="form-label">${scenario.description}</label>
+                            <input type="text" class="form-control" id="customInput-${index}" placeholder="Enter your value">
+                       </div>`
+                    : ""
+            }
+        </div>`;
+    }).join("");
 
     container.innerHTML = `
         <h4>Functionalities Selection</h4>
-        <div id="dynamicGrid">
-            ${scenariosHTML}
-        </div>
-
-        <h4>Additional notes</h4>
-        ${questionsHTML}
-
+        <div id="dynamicGrid">${scenariosHTML}</div>
         <button class="btn btn-primary mt-3" id="nextButton">Next</button>
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
     `;
 
     // Handle Back button
-    document.getElementById('backButton').addEventListener('click', goBack);
+    document.getElementById("backButton").addEventListener("click", goBack);
 
     // Handle Next button
-    document.getElementById('nextButton').addEventListener('click', () => {
+    document.getElementById("nextButton").addEventListener("click", () => {
+        const selectedValues = scenarios.reduce((acc, scenario, index) => {
+            if (scenario.options.length > 1) {
+                const selectedRadio = document.querySelector(`input[name="scenario-${index}"]:checked`);
+                acc[scenario.key] = selectedRadio ? selectedRadio.value : null;
+            }
+            if (scenario.inputBox) {
+                const inputValue = document.getElementById(`customInput-${index}`)?.value;
+                acc[`${scenario.key}_input`] = inputValue || null;
+            }
+            return acc;
+        }, {});
+        console.log("Selected Values:", selectedValues);
         renderGeneralQuestions(); // Proceed to General Questions
-    });
-
-    // Handle scenario interactions
-    document.querySelectorAll('.scenario-img').forEach((img) => {
-        img.addEventListener('click', () => {
-            const scenarioId = img.dataset.scenario;
-            const side = img.dataset.side;
-
-            document
-                .querySelectorAll(`.scenario-img[data-scenario="${scenarioId}"][data-side="${side}"]`)
-                .forEach((image) => image.classList.remove('selected'));
-
-            img.classList.add('selected');
-            selectedImages[scenarioId] = {
-                ...selectedImages[scenarioId],
-                [side]: img.src,
-            };
-        });
-    });
-
-    // Handle toggle switches
-    document.querySelectorAll('.switch-container input').forEach((switchElement) => {
-        const labelSpan = switchElement.nextElementSibling.querySelector('span');
-        switchElement.addEventListener('change', () => {
-            labelSpan.textContent = switchElement.checked ? 'A' : 'B';
-        });
     });
 }
 
@@ -338,7 +356,7 @@ function renderGeneralQuestions() {
                 <label for="contact" class="form-label">How can we contact you?</label>
                 <input type="email" class="form-control" id="contact" name="contact" placeholder="Enter email address" required>
             </div>
-            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+            <button type="button" class="btn btn-primary mt-3" id="submitButton">Submit</button>
         </form>
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
     `;
@@ -359,10 +377,9 @@ function renderGeneralQuestions() {
     // Handle Back button
     document.getElementById('backButton').addEventListener('click', goBack);
 
-    // Handle form submission with validation
-    document.getElementById('generalForm').addEventListener('submit', (event) => {
-        event.preventDefault();
-
+    // Handle Submit button
+    const submitButton = document.getElementById('submitButton');
+    submitButton.addEventListener('click', () => {
         // Validate the RPN field
         const rpnField = document.querySelector('input[name="rpn"]:checked');
         if (!rpnField) {
@@ -379,10 +396,10 @@ function renderGeneralQuestions() {
             contact: document.getElementById('contact').value,
         };
 
-        console.log('General Questions Data:', data);
         alert('Form submitted successfully!');
     });
 }
+
 
 // Go Back Function
 function goBack() {
@@ -398,36 +415,6 @@ function goBack() {
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', renderPurposeSelection);
-
-document.getElementById('selectionForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Map scenario results to meaningful keys
-    const scenarioResults = scenarios.reduce((acc, scenario) => {
-        const switchElement = document.getElementById(`switch-${scenario.id}`);
-        acc[scenario.key] = switchElement.checked ? 'A' : 'B'; // Map the toggle state to meaningful keys
-        return acc;
-    }, {});
-
-    const data = {
-        selected_option: selectedOptionInput.value, // A, B, or C
-        ...scenarioResults, // Spread the meaningful scenario results
-    };
-
-    try {
-        const response = await fetch('http://localhost:3000/save-selections', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-
-        if (!response.ok) throw new Error('Failed to save data');
-        alert('Data saved successfully!');
-    } catch (error) {
-        console.error('Error saving data:', error);
-        alert('Error saving data. Check console for details.');
-    }
-});
 
 // Function to enable double-click zoom for dynamically added images
 function enableDynamicImageZoom() {
@@ -479,4 +466,91 @@ function enableDynamicImageZoom() {
 document.addEventListener('DOMContentLoaded', () => {
     enableDynamicImageZoom();
 });
+
+// Frontend Integration
+document.getElementById('selectionForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Step 1: Determine the flow type (e.g., bespoke-demo, update-config)
+    const flowType = determineFlowType(); // Implement this based on your logic
+
+    // Step 2: Collect data based on the flow type
+    let data = { flowType };
+
+    if (flowType === 'bespoke-demo') {
+        data.landingPageSelection = getLandingPageSelection(); // Get A, B, or C
+        data.tailoredQuestions = getTailoredQuestions(); // Capture tailored question answers
+        data.generalQuestions = getGeneralQuestions(); // Capture general form answers
+    } else if (flowType === 'update-config') {
+        data.updatePageDetails = getUpdatePageDetails(); // Capture update config answers
+    }
+
+    console.log('Collected Data:', data); // Debugging: Ensure data is structured correctly
+
+    // Step 3: Send the data to the backend
+    try {
+        const apiUrl = process.env.API_URL || 'http://localhost:3000';
+        const response = await fetch(`${apiUrl}/save-selections`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('API Response:', result); // Debugging: Log backend response
+        alert('Data saved successfully!');
+    } catch (error) {
+        console.error('Error during API call:', error);
+        alert('Failed to save data. Check console for details.');
+    }
+});
+
+function determineFlowType() {
+    const selectedPurpose = document.querySelector('button[data-purpose].selected');
+    return selectedPurpose ? selectedPurpose.dataset.purpose : null;
+}
+
+function getLandingPageSelection() {
+    const selectedLandingPage = document.querySelector('.option-img.selected');
+    return selectedLandingPage ? selectedLandingPage.dataset.value : null;
+}
+
+function getTailoredQuestions() {
+    return scenarios.reduce((acc, scenario, index) => {
+        const switchElement = document.getElementById(`switch-${scenario.id}`);
+        acc[scenario.key] = switchElement.checked ? 'A' : 'B';
+
+        const customInput = document.getElementById(`customInput-${index}`);
+        if (customInput) {
+            acc[`${scenario.key}_input`] = customInput.value || null;
+        }
+
+        return acc;
+    }, {});
+}
+
+function getGeneralQuestions() {
+    const rpnField = document.querySelector('input[name="rpn"]:checked');
+    return {
+        website: document.getElementById('website').value,
+        rpn: rpnField ? rpnField.value : null,
+        rpnInput: rpnField && rpnField.value === 'yes' ? document.getElementById('rpnInput').value : null,
+        carriers: document.getElementById('carriers').value,
+        additionalInfo: document.getElementById('additionalInfo').value,
+        contact: document.getElementById('contact').value,
+    };
+}
+
+function getUpdatePageDetails() {
+    return {
+        pageName: document.getElementById('pageName').value,
+        changes: document.getElementById('changes').value,
+    };
+}
+
+
 

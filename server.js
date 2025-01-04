@@ -22,24 +22,34 @@ app.get('/', (req, res) => {
     res.send('Server is running...');
 });
 
-// Save user selections to Supabase
+// Save user flow data to Supabase
 app.post('/save-selections', async (req, res) => {
     try {
-        const { selected_option, searchBar, tripTime, returnTrip, passengerType, fareClasses, seatSelection } = req.body;
+        const {
+            flowType, // 'standard-demo', 'bespoke-demo', or 'update-config'
+            landingPageSelection,
+            tailoredQuestions,
+            generalQuestions,
+            updatePageDetails
+        } = req.body;
 
-        // Insert into the database with meaningful columns
-        const { error } = await supabase
-            .from('user_inputs')
-            .insert({
-                pageSelection: selected_option, // A, B, or C
-                searchBar: searchBar,            // "A" or "B"
-                tripTime: tripTime,              // "A" or "B"
-                returnTrip: returnTrip,          // "A" or "B"
-                passengerType: passengerType,    // "A" or "B"
-                fareClasses: fareClasses,        // "A" or "B"
-                seatSelection: seatSelection,    // "A" or "B"
-                submittedAt: new Date().toISOString(), // Current timestamp
-            });
+        // Data structure for insert
+        let insertData = {
+            flow_type: flowType,
+            submitted_at: new Date().toISOString()
+        };
+
+        // Capture flow-specific data
+        if (flowType === 'bespoke-demo') {
+            insertData.landing_page_selection = landingPageSelection || null;
+            insertData.tailored_questions = JSON.stringify(tailoredQuestions) || null;
+            insertData.general_questions = JSON.stringify(generalQuestions) || null;
+        } else if (flowType === 'update-config') {
+            insertData.update_page_details = JSON.stringify(updatePageDetails) || null;
+        }
+
+        // Insert data into Supabase
+        const { error } = await supabase.from('user_flows').insert(insertData);
 
         if (error) throw error;
 
@@ -52,4 +62,3 @@ app.post('/save-selections', async (req, res) => {
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
