@@ -196,7 +196,7 @@ function renderUpdateConfigurationForm() {
                 },
             };
             try {
-                const apiUrl = 'http://localhost:3000'; // Replace with production URL if needed
+                const apiUrl = 'https://wl-support.onrender.com'; // Replace with production URL if needed
                 const response = await fetch(`${apiUrl}/save-selections`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -423,7 +423,7 @@ function renderGeneralQuestions() {
         }
         
         try {
-            const apiUrl = 'http://localhost:3000';
+            const apiUrl = 'https://wl-support.onrender.com';
             const response = await fetch(`${apiUrl}/save-selections`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
