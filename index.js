@@ -46,7 +46,7 @@ const scenarios = [
         key: "customScenario",
         options: ["Image & Input"],
         description: "Enter your custom configuration:",
-        inputBox: true, // Enable input box for this scenario
+        inputBox: true,
         images: ["images/11.png"]
     }
 ];
@@ -55,57 +55,61 @@ const scenarios = [
 const optionsContainer = document.getElementById('options');
 const dynamicGrid = document.getElementById('dynamicGrid');
 const selectedOptionInput = document.getElementById('selectedOption');
-const selectedImages = {}; // To track selections for scenarios
-
-// History stack to track navigation
+const selectedImages = {};
 const historyStack = [];
 
-// Function to render Purpose Selection (Initial Question)
+let selectedPurpose = null; 
+
 function renderPurposeSelection() {
     historyStack.push(() => renderPurposeSelection());
     const container = document.getElementById('dynamicForm');
+
     container.innerHTML = `
         <h3>Could you tell me what you're looking for?</h3>
         <div class="row">
             <div class="col-md-4">
                 <button class="btn btn-outline-primary w-100" data-purpose="standard-demo">
-                    a standard demo page for pitching
+                    A standard demo page for pitching
                 </button>
             </div>
             <div class="col-md-4">
                 <button class="btn btn-outline-primary w-100" data-purpose="bespoke-demo">
-                    a bespoke demo page for pitching
+                    A bespoke demo page for pitching
                 </button>
             </div>
             <div class="col-md-4">
                 <button class="btn btn-outline-primary w-100" data-purpose="update-config">
-                   changes of a production page
+                    Changes of a production page
                 </button>
             </div>
         </div>
     `;
 
     const buttons = container.querySelectorAll('button[data-purpose]');
-    buttons.forEach(button => {
+
+    buttons.forEach((button) => {
         button.addEventListener('click', (event) => {
-            const selectedPurpose = event.target.dataset.purpose;
-            moveToNextModule(selectedPurpose);
+            event.preventDefault();
+            buttons.forEach((btn) => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            selectedPurpose = button.dataset.purpose;
+            moveToNextModule();
         });
     });
 }
 
-// Function to move to the next module
-function moveToNextModule(selectedPurpose) {
+function moveToNextModule() {
     if (selectedPurpose === 'standard-demo') {
         renderStandardDemo();
-    } else if (selectedPurpose === 'update-config') {
-        renderUpdateConfigurationForm();
     } else if (selectedPurpose === 'bespoke-demo') {
         renderBespokeDemoOptions();
+    } else if (selectedPurpose === 'update-config') {
+        renderUpdateConfigurationForm();
+    } else {
+        console.error('Unknown purpose selected:', selectedPurpose);
     }
 }
 
-// Render Standard Demo Page
 function renderStandardDemo() {
     historyStack.push(() => renderStandardDemo());
     const container = document.getElementById('dynamicForm');
@@ -120,7 +124,6 @@ function renderStandardDemo() {
     document.getElementById('backButton').addEventListener('click', goBack);
 }
 
-// Render Bespoke Demo Options
 function renderBespokeDemoOptions() {
     historyStack.push(() => renderBespokeDemoOptions());
     const container = document.getElementById('dynamicForm');
@@ -156,15 +159,12 @@ function renderBespokeDemoOptions() {
 
     document.getElementById('backButton').addEventListener('click', goBack);
 }
-
-
-// Render Update Configuration Form
 function renderUpdateConfigurationForm() {
     historyStack.push(() => renderUpdateConfigurationForm());
     const container = document.getElementById('dynamicForm');
     container.innerHTML = `
         <h3>Update a Production Page</h3>
-        <form id="updateForm">
+        <form id="updateForm"> <!-- Ensure this is properly defined -->
             <div class="mb-3">
                 <label for="pageName" class="form-label">Which page is it?</label>
                 <input type="text" class="form-control" id="pageName" placeholder="Enter page URL" required>
@@ -177,16 +177,54 @@ function renderUpdateConfigurationForm() {
         </form>
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
     `;
-
     document.getElementById('backButton').addEventListener('click', goBack);
+    const updateForm = document.getElementById('updateForm');
+    if (updateForm) {
+        updateForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pageName = document.getElementById('pageName')?.value.trim();
+            const changes = document.getElementById('changes')?.value.trim();
+            if (!pageName || !changes) {
+                alert('Please complete all required fields.');
+                return;
+            }
+            const data = {
+                flowType: 'update-config',
+                updatePageDetails: {
+                    pageName,
+                    changes,
+                },
+            };
+            try {
+                const apiUrl = 'http://localhost:3000'; // Replace with production URL if needed
+                const response = await fetch(`${apiUrl}/save-selections`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API error: ${response.status} - ${errorText}`);
+                }
+
+                const result = await response.json();
+                renderThankYouPage();
+            } catch (error) {
+                console.error('Error during API call:', error);
+                alert('Failed to save data. Check console for details.');
+            }
+        });
+    } else {
+        console.error('Update form not found in the DOM.');
+    }
 }
 
-// Render Landing Page Selection
+let selectedLandingPage = null; 
 function renderLandingPageSelection() {
     historyStack.push(() => renderLandingPageSelection());
     const container = document.getElementById('dynamicForm');
 
-    // Use optionsData to render the landing page options
     container.innerHTML = `
         <h3>What kind of landing page are you looking for?</h3>
         <div class="row">
@@ -206,35 +244,33 @@ function renderLandingPageSelection() {
     `;
 
     // Handle option selection
-    let selectedOption = null;
     document.querySelectorAll('.option-img').forEach((img) => {
         img.addEventListener('click', () => {
             document.querySelectorAll('.option-img').forEach((img) => img.classList.remove('selected'));
             img.classList.add('selected');
-            selectedOption = img.dataset.value; // Capture selected option
-            document.getElementById('nextButton').disabled = false; // Enable Next button
+            selectedLandingPage = img.dataset.value;
+            document.getElementById('nextButton').disabled = false;
         });
     });
 
-    // Handle Next button
     document.getElementById('nextButton').addEventListener('click', () => {
-        if (selectedOption) {
-            renderTailoredQuestions(selectedOption); // Proceed with tailored questions
+        if (selectedLandingPage) {
+            renderTailoredQuestions(selectedLandingPage);
+        } else {
+            alert('Please select a landing page.');
         }
     });
 
-    // Handle Back button
     document.getElementById('backButton').addEventListener('click', goBack);
 }
 
-// Tailored Questions
+let tailoredQuestionsData = {};
 function renderTailoredQuestions(selectedLandingPage) {
     historyStack.push(() => renderTailoredQuestions(selectedLandingPage));
     const container = document.getElementById('dynamicForm');
 
     const scenariosHTML = scenarios.map((scenario, index) => {
         if (scenario.options.length === 1) {
-            // For single-option scenarios, display the image and text without a radio button
             return `
             <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
                 <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
@@ -253,19 +289,25 @@ function renderTailoredQuestions(selectedLandingPage) {
             </div>`;
         }
 
-        // For multiple options, display radio buttons with images and text
         const optionsHTML = scenario.options.map(
             (option, i) => `
             <div class="col-md-4 text-center option-container">
                 <img src="${scenario.images[i]}" alt="${option}" class="img-fluid scenario-img" />
                 <div class="form-check mt-2">
-                    <input class="form-check-input" type="radio" name="scenario-${index}" id="option-${index}-${i}" value="${option}" ${i === 0 ? "checked" : ""}>
+                    <input 
+                        class="form-check-input" 
+                        type="radio" 
+                        name="scenario-${index}" 
+                        id="option-${index}-${i}" 
+                        value="${option}" 
+                        ${i === 0 ? "checked" : ""} 
+                    >
                     <label class="form-check-label d-block" for="option-${index}-${i}">
                         ${option}
                     </label>
                 </div>
             </div>`
-        ).join("");
+        ).join("");        
 
         return `
         <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
@@ -287,39 +329,24 @@ function renderTailoredQuestions(selectedLandingPage) {
     container.innerHTML = `
         <h4>Functionalities Selection</h4>
         <div id="dynamicGrid">${scenariosHTML}</div>
+        <div class="form-group mt-4">
+            <label for="additionalNotes">Additional Notes:</label>
+            <textarea id="additionalNotes" class="form-control" placeholder="Add any additional notes"></textarea>
+        </div>
         <button class="btn btn-primary mt-3" id="nextButton">Next</button>
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
     `;
-
-    // Handle Back button
     document.getElementById("backButton").addEventListener("click", goBack);
-
-    // Handle Next button
     document.getElementById("nextButton").addEventListener("click", () => {
-        const selectedValues = scenarios.reduce((acc, scenario, index) => {
-            if (scenario.options.length > 1) {
-                const selectedRadio = document.querySelector(`input[name="scenario-${index}"]:checked`);
-                acc[scenario.key] = selectedRadio ? selectedRadio.value : null;
-            }
-            if (scenario.inputBox) {
-                const inputValue = document.getElementById(`customInput-${index}`)?.value;
-                acc[`${scenario.key}_input`] = inputValue || null;
-            }
-            return acc;
-        }, {});
-        console.log("Selected Values:", selectedValues);
-        renderGeneralQuestions(); // Proceed to General Questions
-    });
+        tailoredQuestionsData = getTailoredQuestions();
+        renderGeneralQuestions();
+    });      
 }
 
-
-
-// Render General Questions
 function renderGeneralQuestions() {
     historyStack.push(() => renderGeneralQuestions());
     const container = document.getElementById('dynamicForm');
 
-    // Ensure container is left-aligned
     container.style.textAlign = "left";
 
     container.innerHTML = `
@@ -358,7 +385,6 @@ function renderGeneralQuestions() {
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
     `;
 
-    // Conditional input for RPN
     const rpnYes = document.getElementById('rpnYes');
     const rpnNo = document.getElementById('rpnNo');
     const rpnInput = document.getElementById('rpnInput');
@@ -371,85 +397,87 @@ function renderGeneralQuestions() {
         rpnInput.style.display = 'none';
     });
 
-    // Handle Back button
     document.getElementById('backButton').addEventListener('click', goBack);
 
-    // Handle Submit button
     const submitButton = document.getElementById('submitButton');
-    submitButton.addEventListener('click', () => {
-        // Validate the RPN field
-        const rpnField = document.querySelector('input[name="rpn"]:checked');
-        if (!rpnField) {
-            alert("Please select an option for 'Do you have an existing RPN?'");
+    submitButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (!selectedPurpose) {
+            alert('Please select a purpose before submitting.');
             return;
         }
-
-        const data = {
-            website: document.getElementById('website').value,
-            rpn: rpnField.value,
-            rpnInput: rpnField.value === 'yes' ? document.getElementById('rpnInput').value : null,
-            carriers: document.getElementById('carriers').value,
-            additionalInfo: document.getElementById('additionalInfo').value,
-            contact: document.getElementById('contact').value,
-        };
-
-        alert('Form submitted successfully!');
-    });
+    
+        let data = { flowType: selectedPurpose };
+    
+        if (selectedPurpose === 'bespoke-demo') {
+            data.landingPageSelection = getLandingPageSelection();
+            if (!data.landingPageSelection) {
+                alert('Please select a landing page.');
+                return;
+            }
+    
+            data.tailoredQuestions = tailoredQuestionsData;
+            data.generalQuestions = getGeneralQuestions();
+        } else if (selectedPurpose === 'update-config') {
+            data.updatePageDetails = getUpdatePageDetails();
+        }
+        
+        try {
+            const apiUrl = 'http://localhost:3000';
+            const response = await fetch(`${apiUrl}/save-selections`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+    
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`API error: ${response.status} - ${errorText}`);
+            }
+    
+            const result = await response.json();
+            renderThankYouPage();
+        } catch (error) {
+            console.error('Error during API call:', error);
+            alert('Failed to save data. Check console for details.');
+        }
+    });      
 }
 
-
-// Go Back Function
 function goBack() {
-    historyStack.pop(); // Remove current step
-    const previousStep = historyStack.pop(); // Get last step to render
+    historyStack.pop();
+    const previousStep = historyStack.pop();
     if (previousStep) {
-        previousStep(); // Call the previous rendering function
+        previousStep();
     } else {
         console.error('History stack is empty. Cannot navigate back.');
     }
 }
 
-
-// Initialize on DOM load
 document.addEventListener('DOMContentLoaded', renderPurposeSelection);
-
-// Function to enable double-click zoom for dynamically added images
 function enableDynamicImageZoom() {
-    // Attach the event listener to the document or a parent container
-    const parentContainer = document.getElementById('dynamicForm'); // Adjust as needed
+    const parentContainer = document.getElementById('dynamicForm');
     if (!parentContainer) {
         console.error('Parent container for img-fluid not found.');
         return;
     }
-
     parentContainer.addEventListener('dblclick', (event) => {
-        const image = event.target; // Check if the clicked target is an img-fluid
+        const image = event.target;
         if (image.classList.contains('img-fluid')) {
-            // Create the overlay
             const overlay = document.createElement('div');
             overlay.className = 'image-zoom-overlay';
-
-            // Create the zoomed image
             const zoomedImage = document.createElement('img');
-            zoomedImage.src = image.src; // Use the same source as the clicked image
+            zoomedImage.src = image.src; 
             zoomedImage.alt = image.alt;
-
-            // Create the close button
             const closeButton = document.createElement('button');
             closeButton.className = 'close-button';
             closeButton.innerText = 'Close';
             closeButton.addEventListener('click', () => {
-                overlay.remove(); // Remove the overlay on close
+                overlay.remove();
             });
-
-            // Append elements to the overlay
             overlay.appendChild(zoomedImage);
             overlay.appendChild(closeButton);
-
-            // Append the overlay to the body
             document.body.appendChild(overlay);
-
-            // Close the overlay on click outside the image
             overlay.addEventListener('click', (event) => {
                 if (event.target === overlay) {
                     overlay.remove();
@@ -459,94 +487,86 @@ function enableDynamicImageZoom() {
     });
 }
 
-// Ensure the DOM is fully loaded and attach dynamic listener
 document.addEventListener('DOMContentLoaded', () => {
     enableDynamicImageZoom();
 });
 
-// Frontend Integration
-document.getElementById('selectionForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Step 1: Determine the flow type (e.g., bespoke-demo, update-config)
-    const flowType = determineFlowType(); // Implement this based on your logic
-
-    // Step 2: Collect data based on the flow type
-    let data = { flowType };
-
-    if (flowType === 'bespoke-demo') {
-        data.landingPageSelection = getLandingPageSelection(); // Get A, B, or C
-        data.tailoredQuestions = getTailoredQuestions(); // Capture tailored question answers
-        data.generalQuestions = getGeneralQuestions(); // Capture general form answers
-    } else if (flowType === 'update-config') {
-        data.updatePageDetails = getUpdatePageDetails(); // Capture update config answers
-    }
-
-    console.log('Collected Data:', data); // Debugging: Ensure data is structured correctly
-
-    // Step 3: Send the data to the backend
-    try {
-        const apiUrl = process.env.API_URL || 'http://localhost:3000';
-        const response = await fetch(`${apiUrl}/save-selections`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-
-        const result = await response.json();
-        console.log('API Response:', result); // Debugging: Log backend response
-        alert('Data saved successfully!');
-    } catch (error) {
-        console.error('Error during API call:', error);
-        alert('Failed to save data. Check console for details.');
-    }
-});
-
-function determineFlowType() {
-    const selectedPurpose = document.querySelector('button[data-purpose].selected');
-    return selectedPurpose ? selectedPurpose.dataset.purpose : null;
-}
-
 function getLandingPageSelection() {
-    const selectedLandingPage = document.querySelector('.option-img.selected');
-    return selectedLandingPage ? selectedLandingPage.dataset.value : null;
+    if (!selectedLandingPage) {
+        alert('Please select a landing page.');
+        return null;
+    }
+    return selectedLandingPage;
 }
 
 function getTailoredQuestions() {
-    return scenarios.reduce((acc, scenario, index) => {
-        const switchElement = document.getElementById(`switch-${scenario.id}`);
-        acc[scenario.key] = switchElement.checked ? 'A' : 'B';
+    const additionalNotes = document.getElementById("additionalNotes")?.value.trim() || null;
+
+    const tailoredQuestions = scenarios.reduce((acc, scenario, index) => {
+        const selectedRadio = document.querySelector(`input[name="scenario-${index}"]:checked`);
+        if (selectedRadio) {
+            acc[scenario.key] = selectedRadio.value;
+        } else if (scenario.options.length > 1) {
+            console.warn(`No option selected for ${scenario.key}`);
+        }
 
         const customInput = document.getElementById(`customInput-${index}`);
         if (customInput) {
-            acc[`${scenario.key}_input`] = customInput.value || null;
+            acc[`${scenario.key}_input`] = customInput.value.trim() || null;
         }
 
         return acc;
     }, {});
+
+    if (additionalNotes) {
+        tailoredQuestions.additionalNotes = additionalNotes;
+    }
+    return tailoredQuestions;
 }
 
 function getGeneralQuestions() {
     const rpnField = document.querySelector('input[name="rpn"]:checked');
     return {
-        website: document.getElementById('website').value,
+        website: document.getElementById('website').value.trim(),
         rpn: rpnField ? rpnField.value : null,
-        rpnInput: rpnField && rpnField.value === 'yes' ? document.getElementById('rpnInput').value : null,
-        carriers: document.getElementById('carriers').value,
-        additionalInfo: document.getElementById('additionalInfo').value,
-        contact: document.getElementById('contact').value,
+        rpnInput: rpnField && rpnField.value === 'yes' ? document.getElementById('rpnInput').value.trim() : null,
+        carriers: document.getElementById('carriers').value.trim(),
+        additionalInfo: document.getElementById('additionalInfo').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
     };
 }
 
+function validateGeneralQuestions() {
+    const website = document.getElementById('website').value.trim();
+    const contact = document.getElementById('contact').value.trim();
+    if (!website || !contact) {
+        alert('Please fill in all required fields in the General Questions section.');
+        return false;
+    }
+    return true;
+}
+
 function getUpdatePageDetails() {
-    return {
-        pageName: document.getElementById('pageName').value,
-        changes: document.getElementById('changes').value,
-    };
+    const pageName = document.getElementById('pageName')?.value.trim();
+    const changes = document.getElementById('changes')?.value.trim();
+    if (!pageName || !changes) {
+        return null;
+    }
+    return { pageName, changes };
+}
+
+function renderThankYouPage() {
+    const container = document.getElementById('dynamicForm');
+    container.innerHTML = `
+        <div class="text-center mt-5">
+            <h3>Thank You!</h3>
+            <p>Your data has been successfully saved.</p>
+            <button class="btn btn-primary mt-3" id="returnHome">Return to Home</button>
+        </div>
+    `;
+    document.getElementById('returnHome').addEventListener('click', () => {
+        renderPurposeSelection();
+    });
 }
 
 
