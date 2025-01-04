@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 const optionsData = [
     { id: "A", src: "images/opt1.png", alt: "A. Standard WL page" },
     { id: "B", src: "images/opt2.png", alt: "B. Airport transfers page" },
