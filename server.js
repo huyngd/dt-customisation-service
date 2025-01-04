@@ -2,10 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Initialize Supabase
-const supabaseUrl = 'https://kwniegzuziterfmqjrgh.supabase.co'; // Replace with your Supabase URL
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3bmllZ3p1eml0ZXJmbXFqcmdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ4NTUzMTksImV4cCI6MjA1MDQzMTMxOX0.ffi2i653AoqbWhhqcmB2XezRGzkhSFluKWv8d1vApFo'; // Replace with your public anon key
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const app = express();
