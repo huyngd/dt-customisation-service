@@ -153,7 +153,7 @@ function renderBespokeDemoOptions() {
     buttons.forEach(button => {
         button.addEventListener('click', (event) => {
             const selectedOption = event.target.dataset.option;
-            renderLandingPageSelection(selectedOption); // Call Landing Page Module
+            renderLandingPageSelection(selectedOption);
         });
     });
 
@@ -196,7 +196,9 @@ function renderUpdateConfigurationForm() {
                 },
             };
             try {
-                const apiUrl = 'https://wl-support.onrender.com'; // Replace with production URL if needed
+                // const apiUrl = 'https://wl-support.onrender.com'
+                const apiUrl = 'http://localhost:3000';
+
                 const response = await fetch(`${apiUrl}/save-selections`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -248,7 +250,7 @@ function renderLandingPageSelection() {
         img.addEventListener('click', () => {
             document.querySelectorAll('.option-img').forEach((img) => img.classList.remove('selected'));
             img.classList.add('selected');
-            selectedLandingPage = img.dataset.value;
+            selectedLandingPage = img.alt;
             document.getElementById('nextButton').disabled = false;
         });
     });
@@ -423,7 +425,9 @@ function renderGeneralQuestions() {
         }
         
         try {
-            const apiUrl = 'https://wl-support.onrender.com';
+            // const apiUrl = 'https://wl-support.onrender.com'
+            const apiUrl = 'http://localhost:3000';
+
             const response = await fetch(`${apiUrl}/save-selections`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
