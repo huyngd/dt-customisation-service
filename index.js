@@ -1,3 +1,13 @@
+const flowData = {
+    flowType: 'bespoke-demo',
+    bespokeOption: null,
+    agencyCounterInputs: null,
+    landingPageSelection: null,
+    tailoredQuestions: null,
+    generalQuestions: null,
+    submitted_at: new Date().toISOString(),
+};
+
 const optionsData = [
     { id: "A", src: "images/opt1.png", alt: "A. Standard WL page" },
     { id: "B", src: "images/opt2.png", alt: "B. Airport transfers page" },
@@ -130,20 +140,17 @@ function renderBespokeDemoOptions() {
     container.innerHTML = `
         <h3>What are you going to use it for?</h3>
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <button class="btn btn-outline-primary w-100" data-option="Carrier WL">Carrier WL</button>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <button class="btn btn-outline-primary w-100" data-option="OTA WL">OTA WL</button>
             </div>
-            <div class="col-md-4">
-                <button class="btn btn-outline-primary w-100" data-option="Carrier OTA WL">Carrier OTA WL</button>
-            </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <button class="btn btn-outline-primary w-100" data-option="S2B WL">S2B WL</button>
             </div>
-            <div class="col-md-4">
-                <button class="btn btn-outline-primary w-100" data-option="Agency counter WL">Agency counter WL</button>
+            <div class="col-md-3">
+                <button class="btn btn-outline-primary w-100" data-option="Agency counter WL">Agency Counter WL</button>
             </div>
         </div>
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
@@ -153,12 +160,167 @@ function renderBespokeDemoOptions() {
     buttons.forEach(button => {
         button.addEventListener('click', (event) => {
             const selectedOption = event.target.dataset.option;
-            renderLandingPageSelection(selectedOption);
+            flowData.bespokeOption = selectedOption;
+            if (selectedOption === 'Agency counter WL') {
+                renderAgencyCounterInputs();
+            } else {
+                renderLandingPageSelection(selectedOption);
+            }
         });
     });
 
     document.getElementById('backButton').addEventListener('click', goBack);
 }
+
+function renderAgencyCounterInputs() {
+    historyStack.push(() => renderAgencyCounterInputs());
+    const container = document.getElementById('dynamicForm');
+
+    container.innerHTML = `
+        <h3>User Information for Agency Counter WL</h3>
+        <form id="agencyForm">
+            <div id="userInputsContainer">
+                <div class="user-input-row mb-3">
+                    <label class="form-label">User 1:</label>
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="firstName" placeholder="First Name" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" name="lastName" placeholder="Last Name" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="email" class="form-control" name="email" placeholder="Email" required>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <button type="button" class="btn btn-danger btn-sm remove-user-button" style="display: none;">Remove User</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" id="addUserButton" class="btn btn-secondary mb-3">Add Another User</button>
+            
+            <div class="mb-3">
+                <label class="form-label">User Type:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="userType" id="demoAccess" value="Demo" required>
+                    <label class="form-check-label" for="demoAccess">Demo (Demo access allows users full access to create test bookings.)</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="userType" id="productionAccess" value="Production">
+                    <label class="form-check-label" for="productionAccess">Production</label>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">User Access:</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="viewManageCreate" value="View, manage and create bookings">
+                    <label class="form-check-label" for="viewManageCreate">View, manage and create bookings</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="viewCustomerData" value="View booking customer data">
+                    <label class="form-check-label" for="viewCustomerData">View booking customer data</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="portalCustomization" value="Access to Portal customization">
+                    <label class="form-check-label" for="portalCustomization">Access to Portal customization</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="apiDocs" value="Access to API docs">
+                    <label class="form-check-label" for="apiDocs">Access to API docs</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="viewHomeStats" value="View home page details/stats">
+                    <label class="form-check-label" for="viewHomeStats">View home page details/stats</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="viewInsights" value="View insights data & global network">
+                    <label class="form-check-label" for="viewInsights">View insights data & global network</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="manageExternalUsers" value="Manage external users">
+                    <label class="form-check-label" for="manageExternalUsers">Manage external users</label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Next</button>
+        </form>
+        <button class="btn btn-secondary mt-3" id="backButton">Back</button>
+    `;
+
+    // Add user row dynamically
+    const userInputsContainer = document.getElementById('userInputsContainer');
+    const addUserButton = document.getElementById('addUserButton');
+
+    addUserButton.addEventListener('click', () => {
+        const userRow = document.createElement('div');
+        userRow.className = 'user-input-row mb-3';
+        userRow.innerHTML = `
+            <label class="form-label">User ${userInputsContainer.children.length + 1}:</label>
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="firstName" placeholder="First Name" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="lastName" placeholder="Last Name" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="email" class="form-control" name="email" placeholder="Email" required>
+                </div>
+                <div class="col-md-12 mt-2">
+                    <button type="button" class="btn btn-danger btn-sm remove-user-button">Remove User</button>
+                </div>
+            </div>
+        `;
+        userInputsContainer.appendChild(userRow);
+
+        // Attach event listener to the remove button
+        const removeButton = userRow.querySelector('.remove-user-button');
+        removeButton.addEventListener('click', () => {
+            userRow.remove();
+            resetUserLabels(); // Reset user labels
+        });
+    });
+
+    // Function to reset user labels after removal
+    function resetUserLabels() {
+        const userRows = userInputsContainer.querySelectorAll('.user-input-row');
+        userRows.forEach((row, index) => {
+            const label = row.querySelector('.form-label');
+            label.textContent = `User ${index + 1}:`;
+        });
+    }
+
+    // Handle form submission
+    document.getElementById('agencyForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const users = Array.from(document.querySelectorAll('.user-input-row')).map((row) => ({
+            firstName: row.querySelector('input[name="firstName"]').value,
+            lastName: row.querySelector('input[name="lastName"]').value,
+            email: row.querySelector('input[name="email"]').value,
+        }));
+
+        const userType = document.querySelector('input[name="userType"]:checked')?.value;
+
+        const userAccess = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(
+            (checkbox) => checkbox.value
+        );
+
+        flowData.agencyCounterInputs = {
+            users,
+            userType,
+            userAccess,
+        };
+
+        renderLandingPageSelection('Agency Counter WL');
+    });
+
+    document.getElementById('backButton').addEventListener('click', goBack);
+}
+
+
 function renderUpdateConfigurationForm() {
     historyStack.push(() => renderUpdateConfigurationForm());
     const container = document.getElementById('dynamicForm');
@@ -245,7 +407,6 @@ function renderLandingPageSelection() {
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
     `;
 
-    // Handle option selection
     document.querySelectorAll('.option-img').forEach((img) => {
         img.addEventListener('click', () => {
             document.querySelectorAll('.option-img').forEach((img) => img.classList.remove('selected'));
@@ -257,6 +418,7 @@ function renderLandingPageSelection() {
 
     document.getElementById('nextButton').addEventListener('click', () => {
         if (selectedLandingPage) {
+            flowData.landingPageSelection = selectedLandingPage;
             renderTailoredQuestions(selectedLandingPage);
         } else {
             alert('Please select a landing page.');
@@ -340,7 +502,8 @@ function renderTailoredQuestions(selectedLandingPage) {
     `;
     document.getElementById("backButton").addEventListener("click", goBack);
     document.getElementById("nextButton").addEventListener("click", () => {
-        tailoredQuestionsData = getTailoredQuestions();
+        const tailoredQuestions = getTailoredQuestions();
+        flowData.tailoredQuestions = tailoredQuestions;
         renderGeneralQuestions();
     });      
 }
@@ -404,26 +567,37 @@ function renderGeneralQuestions() {
     const submitButton = document.getElementById('submitButton');
     submitButton.addEventListener('click', async (e) => {
         e.preventDefault();
+
         if (!selectedPurpose) {
             alert('Please select a purpose before submitting.');
             return;
         }
-    
-        let data = { flowType: selectedPurpose };
-    
+
+        // Update flowData with the flow type
+        flowData.flowType = selectedPurpose;
+
         if (selectedPurpose === 'bespoke-demo') {
-            data.landingPageSelection = getLandingPageSelection();
-            if (!data.landingPageSelection) {
+            // Update landing page selection
+            const landingPageSelection = getLandingPageSelection();
+            if (!landingPageSelection) {
                 alert('Please select a landing page.');
                 return;
             }
-    
-            data.tailoredQuestions = tailoredQuestionsData;
-            data.generalQuestions = getGeneralQuestions();
+            flowData.landingPageSelection = landingPageSelection;
+
+            // Validate and update general questions
+            if (!validateGeneralQuestions()) {
+                return;
+            }
+            flowData.generalQuestions = getGeneralQuestions();
+
+            // Update tailored questions
+            flowData.tailoredQuestions = tailoredQuestionsData;
         } else if (selectedPurpose === 'update-config') {
-            data.updatePageDetails = getUpdatePageDetails();
+            // Update page details for update-config flow
+            flowData.updatePageDetails = getUpdatePageDetails();
         }
-        
+
         try {
             const apiUrl = 'https://wl-support.onrender.com'
             // const apiUrl = 'http://localhost:3000';
@@ -431,21 +605,21 @@ function renderGeneralQuestions() {
             const response = await fetch(`${apiUrl}/save-selections`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
+                body: JSON.stringify(flowData),
             });
-    
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`API error: ${response.status} - ${errorText}`);
             }
-    
+
             const result = await response.json();
             renderThankYouPage();
         } catch (error) {
             console.error('Error during API call:', error);
             alert('Failed to save data. Check console for details.');
         }
-    });      
+    });   
 }
 
 function goBack() {
@@ -540,16 +714,6 @@ function getGeneralQuestions() {
     };
 }
 
-function validateGeneralQuestions() {
-    const website = document.getElementById('website').value.trim();
-    const contact = document.getElementById('contact').value.trim();
-    if (!website || !contact) {
-        alert('Please fill in all required fields in the General Questions section.');
-        return false;
-    }
-    return true;
-}
-
 function getUpdatePageDetails() {
     const pageName = document.getElementById('pageName')?.value.trim();
     const changes = document.getElementById('changes')?.value.trim();
@@ -573,5 +737,44 @@ function renderThankYouPage() {
     });
 }
 
+function validateGeneralQuestions() {
+    const website = document.getElementById('website').value.trim();
+    const contact = document.getElementById('contact').value.trim();
+    const rpnField = document.querySelector('input[name="rpn"]:checked');
+    const rpnInput = document.getElementById('rpnInput')?.value.trim();
+
+    if (!website) {
+        alert('Website is required.');
+        highlightMissingField('website');
+        return false;
+    }
+
+    if (!contact) {
+        alert('Contact email is required.');
+        highlightMissingField('contact');
+        return false;
+    }
+
+    if (!rpnField) {
+        alert('Please select if you have an existing RPN.');
+        highlightMissingField('rpnYes');
+        return false;
+    }
+
+    if (rpnField.value === 'yes' && !rpnInput) {
+        alert('Please provide your RPN.');
+        highlightMissingField('rpnInput');
+        return false;
+    }
+
+    return true;
+}
 
 
+function highlightMissingField(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (field) {
+        field.classList.add('is-invalid');
+        field.addEventListener('input', () => field.classList.remove('is-invalid'), { once: true });
+    }
+}

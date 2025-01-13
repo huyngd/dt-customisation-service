@@ -26,7 +26,9 @@ app.get('/', (req, res) => {
 app.post('/save-selections', async (req, res) => {
     try {
         const {
-            flowType, // 'standard-demo', 'bespoke-demo', or 'update-config'
+            flowType,
+            bespokeOption,
+            agencyCounterInputs,
             landingPageSelection,
             tailoredQuestions,
             generalQuestions,
@@ -42,6 +44,10 @@ app.post('/save-selections', async (req, res) => {
 
         // Directly insert JSONB fields without stringification
         if (flowType === 'bespoke-demo') {
+            insertData.bespoke_option = bespokeOption;
+            if (agencyCounterInputs) {
+                insertData.agency_counter_inputs = agencyCounterInputs; // Keep as JSON
+            }
             insertData.landing_page_selection = landingPageSelection || null;
             insertData.tailored_questions = tailoredQuestions || null; // Keep as JSON
             insertData.general_questions = generalQuestions || null; // Keep as JSON
@@ -60,6 +66,9 @@ app.post('/save-selections', async (req, res) => {
         // Parse JSONB fields before returning
         const cleanedData = insertedData.map(row => ({
             ...row,
+            agency_counter_inputs: typeof row.agency_counter_inputs === 'string'
+                ? JSON.parse(row.agency_counter_inputs)
+                : row.agency_counter_inputs,
             tailored_questions: typeof row.tailored_questions === 'string'
                 ? JSON.parse(row.tailored_questions)
                 : row.tailored_questions,

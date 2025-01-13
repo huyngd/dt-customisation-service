@@ -154,3 +154,8 @@ button[data-purpose]:hover {
 .text-center {
     text-align: left!important;
 }
+
+.is-invalid {
+    border-color: red;
+    background-color: #ffe6e6;
+}
