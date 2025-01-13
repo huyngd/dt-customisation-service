@@ -40,30 +40,34 @@ const findSlackUserIdByEmail = async (email) => {
 // Function to send Slack notification with tagging
 const sendSlackNotification = async (message, data, email) => {
     try {
-        const specificUserId = await findSlackUserIdByEmail(email);
-        const taggedUser = specificUserId ? `<@${specificUserId}>` : email;
-        const defaultUserTag = `<@U05CXS0QAH1>`;
-        const channelId = 'C086P0WV7G8';
+        const emailToUse = email || "Unknown User";
 
-        if (specificUserId) {
-            try {
-                await slackClient.conversations.invite({
-                    channel: channelId,
-                    users: specificUserId,
-                });
-                console.log(`User <@${specificUserId}> added to the channel.`);
-            } catch (inviteError) {
-                console.error(`Error adding user <@${specificUserId}> to the channel:`, inviteError.message);
-            }
+        // Find the user by email
+        const specificUserId = await findSlackUserIdByEmail(emailToUse);
+        const taggedUser = specificUserId ? `<@${specificUserId}>` : emailToUse; // Use the email if user not found
+        const defaultUserTag = `<@U05CXS0QAH1>`; // Replace with the default user ID
+        const channelId = 'C086P0WV7G8'; // Replace with your channel ID
+
+        // Construct the notification message dynamically
+        let slackText = `New Request Submitted by ${taggedUser}.\ncc: ${defaultUserTag}\n`;
+
+        if (data[0]?.flow_type === 'update-config') {
+            const { pageName, changes, contact } = data[0]?.update_page_details || {};
+            slackText += `Flow Type: update-config\n`;
+        } else {
+            slackText += `Flow Type: ${data[0]?.flow_type || 'N/A'}\n`;
+            slackText += `Bespoke Option: ${data[0]?.bespoke_option || 'N/A'}\n`;
         }
 
+        // Send the main message
         const slackMessage = {
             channel: channelId,
-            text: `New Request Submitted by ${taggedUser}.\ncc: ${defaultUserTag}\n${message}`,
+            text: slackText,
         };
 
         const slackResponse = await slackClient.chat.postMessage(slackMessage);
 
+        // Add JSON data as a thread comment
         if (slackResponse.ts) {
             await slackClient.chat.postMessage({
                 channel: slackResponse.channel,
@@ -167,7 +171,11 @@ app.post('/save-selections', async (req, res) => {
 Flow Type: ${flowType}
 Bespoke Option: ${bespokeOption || 'N/A'}
         `;
-        await sendSlackNotification(slackMessage, cleanedData, generalQuestions?.contact || 'huy.dang.nguyen@distribusion.com');
+        await sendSlackNotification(
+            slackMessage,
+            cleanedData,
+            updatePageDetails?.contact || generalQuestions?.contact
+        );        
 
         res.status(200).json(cleanedData);
     } catch (error) {

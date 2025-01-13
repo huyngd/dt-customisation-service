@@ -43,13 +43,13 @@ const scenarios = [
         id: "scenario5",
         key: "fareClasses",
         options: ["Search results", "Checkout", "Nowhere"],
-        images: ["images/12.png", "images/13.png", "images/13.png"]
+        images: ["images/12.png", "images/13.png", "images/16.png"]
     },
     {
         id: "scenario6",
         key: "seatSelection",
         options: ["Search results", "Checkout", "No seat selection"],
-        images: ["images/14.gif", "images/15.gif", "images/15.gif"]
+        images: ["images/14.gif", "images/15.gif", "images/17.gif"]
     },
     {
         id: "scenario7",
@@ -364,8 +364,8 @@ function renderUpdateConfigurationForm() {
                 },
             };
             try {
-                const apiUrl = 'https://wl-support.onrender.com'
-                // const apiUrl = 'http://localhost:3000';
+                // const apiUrl = 'https://wl-support.onrender.com'
+                const apiUrl = 'http://localhost:3000';
 
                 const response = await fetch(`${apiUrl}/save-selections`, {
                     method: 'POST',
@@ -608,8 +608,8 @@ function renderGeneralQuestions() {
         }
 
         try {
-            const apiUrl = 'https://wl-support.onrender.com'
-            // const apiUrl = 'http://localhost:3000';
+            // const apiUrl = 'https://wl-support.onrender.com'
+            const apiUrl = 'http://localhost:3000';
 
             const response = await fetch(`${apiUrl}/save-selections`, {
                 method: 'POST',
