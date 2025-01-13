@@ -9,9 +9,9 @@ const flowData = {
 };
 
 const optionsData = [
-    { id: "A", src: "images/opt1.png", alt: "A. Standard WL page" },
-    { id: "B", src: "images/opt2.png", alt: "B. Airport transfers page" },
-    { id: "C", src: "images/opt3.png", alt: "C. Public transportation page" }
+    { id: "A", src: "images/opt1.png", alt: "Standard WL page" },
+    { id: "B", src: "images/opt2.png", alt: "Airport transfers page" },
+    { id: "C", src: "images/opt3.png", alt: "Public transportation page" }
 ];
 
 const scenarios = [
@@ -126,7 +126,7 @@ function renderStandardDemo() {
     container.innerHTML = `
         <h3>Great choice!</h3>
         <p>
-            Please check it out <a href="https://docs.google.com/spreadsheets/d/1c3CntR5STeQHUioqcVJrOkv3mPI73YFOjgB1mdqfeZw/edit?gid=0#gid=0" target="_blank">here</a>.
+            Please check it out <a href="https://docs.google.com/spreadsheets/d/1c3CntR5STeQHUioqcVJrOkv3mPI73YFOjgB1mdqfeZw/edit?gid=0#gid=0" target="_blank">HERE</a>.
         </p>
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
     `;
@@ -326,7 +326,7 @@ function renderUpdateConfigurationForm() {
     const container = document.getElementById('dynamicForm');
     container.innerHTML = `
         <h3>Update a Production Page</h3>
-        <form id="updateForm"> <!-- Ensure this is properly defined -->
+        <form id="updateForm">
             <div class="mb-3">
                 <label for="pageName" class="form-label">Which page is it?</label>
                 <input type="text" class="form-control" id="pageName" placeholder="Enter page URL" required>
@@ -334,6 +334,10 @@ function renderUpdateConfigurationForm() {
             <div class="mb-3">
                 <label for="changes" class="form-label">What changes do you want to make?</label>
                 <textarea class="form-control" id="changes" rows="4" placeholder="Describe the changes" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="contact" class="form-label">How can we contact you?</label>
+                <input type="email" class="form-control" id="contact" name="contact" placeholder="Enter email address" required>
             </div>
             <button type="submit" class="btn btn-primary mt-3">Submit</button>
         </form>
@@ -346,6 +350,7 @@ function renderUpdateConfigurationForm() {
             e.preventDefault();
             const pageName = document.getElementById('pageName')?.value.trim();
             const changes = document.getElementById('changes')?.value.trim();
+            const contact = document.getElementById('contact')?.value.trim();
             if (!pageName || !changes) {
                 alert('Please complete all required fields.');
                 return;
@@ -355,6 +360,7 @@ function renderUpdateConfigurationForm() {
                 updatePageDetails: {
                     pageName,
                     changes,
+                    contact
                 },
             };
             try {
@@ -492,6 +498,9 @@ function renderTailoredQuestions(selectedLandingPage) {
 
     container.innerHTML = `
         <h4>Functionalities Selection</h4>
+        <div class="alert alert-warning" role="alert">
+            Disclaimer: The functionality selected will only be available if it fits the carrier
+        </div>
         <div id="dynamicGrid">${scenariosHTML}</div>
         <div class="form-group mt-4">
             <label for="additionalNotes">Additional Notes:</label>
@@ -502,8 +511,8 @@ function renderTailoredQuestions(selectedLandingPage) {
     `;
     document.getElementById("backButton").addEventListener("click", goBack);
     document.getElementById("nextButton").addEventListener("click", () => {
-        const tailoredQuestions = getTailoredQuestions();
-        flowData.tailoredQuestions = tailoredQuestions;
+        tailoredQuestionsData = getTailoredQuestions(); 
+        flowData.tailoredQuestions = tailoredQuestionsData; 
         renderGeneralQuestions();
     });      
 }
@@ -728,7 +737,7 @@ function renderThankYouPage() {
     container.innerHTML = `
         <div class="text-center mt-5">
             <h3>Thank You!</h3>
-            <p>Your data has been successfully saved.</p>
+            <p>Request Received - Help is on the way!</p>
             <button class="btn btn-primary mt-3" id="returnHome">Return to Home</button>
         </div>
     `;
