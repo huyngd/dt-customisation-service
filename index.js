@@ -17,48 +17,103 @@ const optionsData = [
 const scenarios = [
     {
         id: "scenario1",
-        key: "searchBar",
+        key: "Search Bar",
         options: ["Row search bar", "Column search bar"],
         images: ["images/10.png", "images/11.png"]
     },
     {
         id: "scenario2",
-        key: "tripTime",
+        key: "Trip Time",
         options: ["Enabled", "Disabled"],
         images: ["images/image6.png", "images/image7.png"]
     },
     {
         id: "scenario3",
-        key: "returnTrip",
+        key: "Return Trip",
         options: ["Enabled", "Disabled"],
         images: ["images/image8.png", "images/image9.png"]
     },
     {
         id: "scenario4",
-        key: "passengerType",
+        key: "Passenger Type",
         options: ["Enabled", "Disabled"],
         images: ["images/image5.png", "images/image4.png"]
     },
     {
+        id: "scenario9",
+        key: "Billing Address",
+        options: ["Enabled", "Disabled"],
+        images: ["images/20.png", "images/21.png"]
+    },
+    {
+        id: "scenario10",
+        key: "Checkout Type",
+        options: ["Normal", "Express"],
+        images: ["images/22.png", "images/23.png"]
+    },
+    {
+        id: "scenario11",
+        key: "Fare Media",
+        options: ["Enabled", "Disabled"],
+        images: ["images/26.png", "images/27.png"],
+        description: "If enable, please upload the pictures to a shared drive folder and put the link here: ",
+        inputBox: true
+    },
+    {
         id: "scenario5",
-        key: "fareClasses",
+        key: "Fare Classes",
         options: ["Search results", "Checkout", "Nowhere"],
         images: ["images/12.png", "images/13.png", "images/16.png"]
     },
     {
         id: "scenario6",
-        key: "seatSelection",
+        key: "Seat Selection",
         options: ["Search results", "Checkout", "No seat selection"],
         images: ["images/14.gif", "images/15.gif", "images/17.gif"]
     },
     {
+        id: "scenario12",
+        key: "Station info",
+        options: ["Enabled", "Disabled"],
+        images: ["images/28.gif"]
+    },
+    {
         id: "scenario7",
-        key: "customScenario",
-        options: ["Image & Input"],
-        description: "Enter your custom configuration:",
+        key: "Affiliate partnership with Expedia's accommodation",
+        options: ["Enabled", "Disabled"],
+        images: ["images/18.gif"]
+    },
+    {
+        id: "scenario8",
+        key: "Ancillaries",
+        options: ["Enabled", "Disabled"],
+        images: ["images/19.png"],
+        description: "If enable, specify your targeted ancillaries (or let us know if you wish to add fake ones)",
         inputBox: true,
-        images: ["images/11.png"]
-    }
+    },
+    {
+        id: "scenario13",
+        key: "Reselling Banner",
+        options: ["Enabled", "Disabled"],
+        images: ["images/30.png"],
+        description: "If enable, please upload a picture + a text file containing the texts to be displayed and the URL for redirection to a shared drive folder and put the link here:",
+        inputBox: true
+    },
+    {
+        id: "scenario14",
+        key: "Invoicing Option",
+        options: ["Enabled", "Disabled"],
+        images: ["images/31.gif"]
+    },
+    {
+        id: "scenario15",
+        key: "Payment Methods",
+        options: ["pix", "creditCard", "googlePay", "applePay", "cash", "terminal", "invoice", "paypal", "blik", "storedPayment", "ideal"],
+        images: ["images/32.png"],
+        description: "Select the payment method you want to offer.",
+        allowMultiple: true
+    },
+    
 ];
 
 
@@ -364,8 +419,8 @@ function renderUpdateConfigurationForm() {
                 },
             };
             try {
-                // const apiUrl = 'https://wl-support.onrender.com'
-                const apiUrl = 'http://localhost:3000';
+                const apiUrl = 'https://wl-support.onrender.com'
+                // const apiUrl = 'http://localhost:3000';
 
                 const response = await fetch(`${apiUrl}/save-selections`, {
                     method: 'POST',
@@ -440,13 +495,33 @@ function renderTailoredQuestions(selectedLandingPage) {
     const container = document.getElementById('dynamicForm');
 
     const scenariosHTML = scenarios.map((scenario, index) => {
-        if (scenario.options.length === 1) {
+        // Single Image with Multiple-Choice Options (Checkboxes)
+        if (scenario.images.length === 1 && scenario.allowMultiple) {
+            const optionsHTML = scenario.options.map(
+                (option, i) => `
+                <div class="form-check mt-2">
+                    <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name="scenario-${index}" 
+                        id="option-${index}-${i}" 
+                        value="${option}"
+                    >
+                    <label class="form-check-label" for="option-${index}-${i}">
+                        ${option}
+                    </label>
+                </div>`
+            ).join("");
+
             return `
             <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
                 <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
+                ${scenario.description ? `<p class="mt-3 text-muted">${scenario.description}</p>` : ""}
                 <div class="text-center">
-                    <img src="${scenario.images[0]}" alt="${scenario.options[0]}" class="img-fluid scenario-img" />
-                    <p class="mt-2"><strong>${scenario.options[0]}</strong></p>
+                    <img src="${scenario.images[0]}" alt="Scenario Image" class="img-fluid scenario-img mb-3" />
+                </div>
+                <div>
+                    ${optionsHTML}
                 </div>
                 ${
                     scenario.inputBox
@@ -459,10 +534,10 @@ function renderTailoredQuestions(selectedLandingPage) {
             </div>`;
         }
 
-        const optionsHTML = scenario.options.map(
-            (option, i) => `
-            <div class="col-md-4 text-center option-container">
-                <img src="${scenario.images[i]}" alt="${option}" class="img-fluid scenario-img" />
+        // Single Image with Radio Buttons
+        if (scenario.images.length === 1 && !scenario.allowMultiple) {
+            const optionsHTML = scenario.options.map(
+                (option, i) => `
                 <div class="form-check mt-2">
                     <input 
                         class="form-check-input" 
@@ -470,18 +545,60 @@ function renderTailoredQuestions(selectedLandingPage) {
                         name="scenario-${index}" 
                         id="option-${index}-${i}" 
                         value="${option}" 
-                        ${i === 0 ? "checked" : ""} 
+                        ${i === 0 ? "checked" : ""}
                     >
-                    <label class="form-check-label d-block" for="option-${index}-${i}">
+                    <label class="form-check-label" for="option-${index}-${i}">
+                        ${option}
+                    </label>
+                </div>`
+            ).join("");
+
+            return `
+            <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
+                <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
+                ${scenario.description ? `<p class="mt-3 text-muted">${scenario.description}</p>` : ""}
+                <div class="text-center">
+                    <img src="${scenario.images[0]}" alt="Scenario Image" class="img-fluid scenario-img mb-3" />
+                </div>
+                <div>
+                    ${optionsHTML}
+                </div>
+                ${
+                    scenario.inputBox
+                        ? `<div class="mt-3">
+                            <label for="customInput-${index}" class="form-label">${scenario.description}</label>
+                            <input type="text" class="form-control" id="customInput-${index}" placeholder="Enter your value">
+                           </div>`
+                        : ""
+                }
+            </div>`;
+        }
+
+        // Multiple Images with Radio Buttons
+        const optionsHTML = scenario.options.map(
+            (option, i) => `
+            <div class="col-md-4 text-center option-container">
+                ${scenario.images[i] ? `<img src="${scenario.images[i]}" alt="${option}" class="img-fluid scenario-img mb-2">` : ""}
+                <div class="form-check mt-2">
+                    <input 
+                        class="form-check-input" 
+                        type="radio" 
+                        name="scenario-${index}" 
+                        id="option-${index}-${i}" 
+                        value="${option}" 
+                        ${i === 0 ? "checked" : ""}
+                    >
+                    <label class="form-check-label" for="option-${index}-${i}">
                         ${option}
                     </label>
                 </div>
             </div>`
-        ).join("");        
+        ).join("");
 
         return `
         <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
             <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
+            ${scenario.description && !scenario.inputBox ? `<p class="mt-3 text-muted">${scenario.description}</p>` : ""}
             <div class="row justify-content-center">
                 ${optionsHTML}
             </div>
@@ -509,12 +626,14 @@ function renderTailoredQuestions(selectedLandingPage) {
         <button class="btn btn-primary mt-3" id="nextButton">Next</button>
         <button class="btn btn-secondary mt-3" id="backButton">Back</button>
     `;
+
+    // Event Listeners for Navigation
     document.getElementById("backButton").addEventListener("click", goBack);
     document.getElementById("nextButton").addEventListener("click", () => {
         tailoredQuestionsData = getTailoredQuestions(); 
         flowData.tailoredQuestions = tailoredQuestionsData; 
         renderGeneralQuestions();
-    });      
+    });
 }
 
 function renderGeneralQuestions() {
@@ -608,8 +727,8 @@ function renderGeneralQuestions() {
         }
 
         try {
-            // const apiUrl = 'https://wl-support.onrender.com'
-            const apiUrl = 'http://localhost:3000';
+            const apiUrl = 'https://wl-support.onrender.com'
+            // const apiUrl = 'http://localhost:3000';
 
             const response = await fetch(`${apiUrl}/save-selections`, {
                 method: 'POST',
@@ -690,13 +809,24 @@ function getTailoredQuestions() {
     const additionalNotes = document.getElementById("additionalNotes")?.value.trim() || null;
 
     const tailoredQuestions = scenarios.reduce((acc, scenario, index) => {
-        const selectedRadio = document.querySelector(`input[name="scenario-${index}"]:checked`);
-        if (selectedRadio) {
-            acc[scenario.key] = selectedRadio.value;
-        } else if (scenario.options.length > 1) {
-            console.warn(`No option selected for ${scenario.key}`);
+        if (scenario.allowMultiple) {
+            // Collect all checked values for multiple-choice options
+            const selectedOptions = Array.from(
+                document.querySelectorAll(`input[name="scenario-${index}"]:checked`)
+            ).map(input => input.value);
+
+            acc[scenario.key] = selectedOptions.length > 0 ? selectedOptions : null;
+        } else {
+            // Collect single selected value for radio buttons
+            const selectedRadio = document.querySelector(`input[name="scenario-${index}"]:checked`);
+            if (selectedRadio) {
+                acc[scenario.key] = selectedRadio.value;
+            } else if (scenario.options.length > 1) {
+                console.warn(`No option selected for ${scenario.key}`);
+            }
         }
 
+        // Include additional input box data if applicable
         const customInput = document.getElementById(`customInput-${index}`);
         if (customInput) {
             acc[`${scenario.key}_input`] = customInput.value.trim() || null;
@@ -710,6 +840,7 @@ function getTailoredQuestions() {
     }
     return tailoredQuestions;
 }
+
 
 function getGeneralQuestions() {
     const rpnField = document.querySelector('input[name="rpn"]:checked');
