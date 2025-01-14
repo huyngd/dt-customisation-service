@@ -40,6 +40,42 @@ const scenarios = [
         images: ["images/image5.png", "images/image4.png"]
     },
     {
+        id: "scenario22",
+        key: "Price Calendar",
+        options: ["Enabled", "Disabled"],
+        images: ["images/39.png", "images/40.png"]
+    },
+    {
+        id: "scenario23",
+        key: "Search Calendar",
+        options: ["Enabled", "Disabled"],
+        images: ["images/41.png", "images/42.png"]
+    },
+    {
+        id: "scenario24",
+        key: "Transportation Mode",
+        options: ["Enabled", "Disabled"],
+        images: ["images/43.png", "images/44.png"]
+    },
+    {
+        id: "scenario19",
+        key: "Email Verificaiton",
+        options: ["Enabled", "Disabled"],
+        images: ["images/24.png", "images/25.png"]
+    },
+    {
+        id: "scenario20",
+        key: "Discount Code",
+        options: ["Enabled", "Disabled"],
+        images: ["images/35.png", "images/36.png"]
+    },
+    {
+        id: "scenario21",
+        key: "Passenger Discount Code",
+        options: ["Enabled", "Disabled"],
+        images: ["images/37.png", "images/38.png"]
+    },
+    {
         id: "scenario9",
         key: "Billing Address",
         options: ["Enabled", "Disabled"],
@@ -70,6 +106,20 @@ const scenarios = [
         key: "Seat Selection",
         options: ["Search results", "Checkout", "No seat selection"],
         images: ["images/14.gif", "images/15.gif", "images/17.gif"]
+    },
+    {
+        id: "scenario17",
+        key: "Default Language",
+        images: ["images/34.png"],
+        description: "Please specify the default language based on the supported list in the image",
+        inputBox: true,
+    },
+    {
+        id: "scenario18",
+        key: "Default Currency",
+        images: ["images/33.png"],
+        description: "Please specify the default currency based on the supported list in the image",
+        inputBox: true,
     },
     {
         id: "scenario12",
@@ -495,6 +545,27 @@ function renderTailoredQuestions(selectedLandingPage) {
     const container = document.getElementById('dynamicForm');
 
     const scenariosHTML = scenarios.map((scenario, index) => {
+        // Handle scenarios with no options (only an image and input box)
+        if (!scenario.options || scenario.options.length === 0) {
+            return `
+            <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
+                <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
+                <div class="text-center">
+                    <img src="${scenario.images[0]}" alt="Scenario Image" class="img-fluid scenario-img mb-3" />
+                </div>
+                ${
+                    scenario.inputBox
+                        ? `<div class="mt-3">
+                            ${scenario.description ? `<label for="customInput-${index}" class="form-label">${scenario.description}</label>` : ""}
+                            <input type="text" class="form-control" id="customInput-${index}" placeholder="Enter your value">
+                           </div>`
+                        : scenario.description
+                        ? `<p class="mt-3 text-muted">${scenario.description}</p>`
+                        : ""
+                }
+            </div>`;
+        }
+
         // Single Image with Multiple-Choice Options (Checkboxes)
         if (scenario.images.length === 1 && scenario.allowMultiple) {
             const optionsHTML = scenario.options.map(
@@ -516,7 +587,6 @@ function renderTailoredQuestions(selectedLandingPage) {
             return `
             <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
                 <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
-                ${scenario.description ? `<p class="mt-3 text-muted">${scenario.description}</p>` : ""}
                 <div class="text-center">
                     <img src="${scenario.images[0]}" alt="Scenario Image" class="img-fluid scenario-img mb-3" />
                 </div>
@@ -526,7 +596,7 @@ function renderTailoredQuestions(selectedLandingPage) {
                 ${
                     scenario.inputBox
                         ? `<div class="mt-3">
-                            <label for="customInput-${index}" class="form-label">${scenario.description}</label>
+                            ${scenario.description ? `<label for="customInput-${index}" class="form-label">${scenario.description}</label>` : ""}
                             <input type="text" class="form-control" id="customInput-${index}" placeholder="Enter your value">
                            </div>`
                         : ""
@@ -556,7 +626,6 @@ function renderTailoredQuestions(selectedLandingPage) {
             return `
             <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
                 <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
-                ${scenario.description ? `<p class="mt-3 text-muted">${scenario.description}</p>` : ""}
                 <div class="text-center">
                     <img src="${scenario.images[0]}" alt="Scenario Image" class="img-fluid scenario-img mb-3" />
                 </div>
@@ -566,7 +635,7 @@ function renderTailoredQuestions(selectedLandingPage) {
                 ${
                     scenario.inputBox
                         ? `<div class="mt-3">
-                            <label for="customInput-${index}" class="form-label">${scenario.description}</label>
+                            ${scenario.description ? `<label for="customInput-${index}" class="form-label">${scenario.description}</label>` : ""}
                             <input type="text" class="form-control" id="customInput-${index}" placeholder="Enter your value">
                            </div>`
                         : ""
@@ -598,14 +667,13 @@ function renderTailoredQuestions(selectedLandingPage) {
         return `
         <div class="scenario rounded p-3 mb-3" style="border: 1px solid #ccc;">
             <h5 class="mb-3">${scenario.key.replace(/([A-Z])/g, " $1").trim()}</h5>
-            ${scenario.description && !scenario.inputBox ? `<p class="mt-3 text-muted">${scenario.description}</p>` : ""}
             <div class="row justify-content-center">
                 ${optionsHTML}
             </div>
             ${
                 scenario.inputBox
                     ? `<div class="mt-3">
-                            <label for="customInput-${index}" class="form-label">${scenario.description}</label>
+                            ${scenario.description ? `<label for="customInput-${index}" class="form-label">${scenario.description}</label>` : ""}
                             <input type="text" class="form-control" id="customInput-${index}" placeholder="Enter your value">
                        </div>`
                     : ""

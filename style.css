@@ -122,7 +122,7 @@ button[data-purpose]:hover {
 
 .scenario-img {
     width: 100%; /* Make the image responsive */
-    max-width: 600px; /* Set a larger max width for all images */
+    max-width: 400px; /* Set a larger max width for all images */
     height: auto; /* Maintain aspect ratio */
     border-radius: 8px; /* Add rounded corners */
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for better visuals */
