@@ -79,13 +79,15 @@ const scenarios = [
         id: "scenario20",
         key: "Discount Code",
         options: ["Enabled", "Disabled"],
-        images: ["images/35.png", "images/36.png"]
+        images: ["images/35.png", "images/36.png"],
+        description: "This is only available for carriers/retailers that support discount code, please check with Demand team about this request."
     },
     {
         id: "scenario21",
         key: "Passenger Discount Code",
         options: ["Enabled", "Disabled"],
-        images: ["images/37.png", "images/38.png"]
+        images: ["images/37.png", "images/38.png"],
+        description: "This is only available for carriers/retailers that support discount code, please check with Demand team about this request."
     },
     {
         id: "scenario9",
@@ -149,7 +151,8 @@ const scenarios = [
         id: "scenario7",
         key: "Affiliate partnership with Expedia's accommodation",
         options: ["Enabled", "Disabled"],
-        images: ["images/18.gif"]
+        images: ["images/18.gif"],
+        description: "This is only available for carriers that have realtime data integrated, please check with Content Engineering team about this request."
     },
     {
         id: "scenario27",
