@@ -46,7 +46,7 @@ const sendSlackNotification = async (message, data, email) => {
         const specificUserId = await findSlackUserIdByEmail(emailToUse);
         const taggedUser = specificUserId ? `<@${specificUserId}>` : emailToUse; // Use the email if user not found
         const defaultUserTag = `<@U05CXS0QAH1>`; // Replace with the default user ID
-        const channelId = 'C086P0WV7G8'; // Replace with your channel ID
+        const channelId = 'C088BL697AT'; // Replace with your channel ID
 
         // Construct the notification message dynamically
         let slackText = `New Request Submitted by ${taggedUser}.\ncc: ${defaultUserTag}\n`;
