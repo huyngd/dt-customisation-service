@@ -40,6 +40,12 @@ const scenarios = [
         images: ["images/image5.png", "images/image4.png"]
     },
     {
+        id: "scenario26",
+        key: "Passenger type list",
+        options: ["Enabled", "Disabled"],
+        images: ["images/47.png", "images/48.png"]
+    },
+    {
         id: "scenario22",
         key: "Price Calendar",
         options: ["Enabled", "Disabled"],
@@ -56,6 +62,12 @@ const scenarios = [
         key: "Transportation Mode",
         options: ["Enabled", "Disabled"],
         images: ["images/43.png", "images/44.png"]
+    },
+    {
+        id: "scenario25",
+        key: "Carrier logo in results",
+        options: ["Marketing Carrier", "Operating Carrier"],
+        images: ["images/45.png", "images/46.png"]
     },
     {
         id: "scenario19",
@@ -128,17 +140,31 @@ const scenarios = [
         images: ["images/28.gif"]
     },
     {
+        id: "scenario28",
+        key: "Realtime tracking",
+        options: ["Enabled", "Disabled"],
+        images: ["images/50.gif"]
+    },
+    {
         id: "scenario7",
         key: "Affiliate partnership with Expedia's accommodation",
         options: ["Enabled", "Disabled"],
         images: ["images/18.gif"]
     },
     {
+        id: "scenario27",
+        key: "Popular Journeys",
+        options: ["Enabled", "Disabled"],
+        images: ["images/49.png"],
+        description: "If enable, please specify the ODs & link to the folder of images to use if any",
+        inputBox: true,
+    },
+    {
         id: "scenario8",
         key: "Ancillaries",
         options: ["Enabled", "Disabled"],
         images: ["images/19.png"],
-        description: "If enable, specify your targeted ancillaries (or let us know if you wish to add fake ones)",
+        description: "If enable, please specify your targeted ancillaries (or let us know if you wish to add fake ones)",
         inputBox: true,
     },
     {
