@@ -209,8 +209,10 @@ function renderPurposeSelection() {
     const container = document.getElementById('dynamicForm');
 
     container.innerHTML = `
-        <h1>Welcome!</h1>
-        <div class="text-start mt-2 mb-4">Explore the options below to find the perfect white label solution for your needs.</div>
+        <h2>
+    Welcome to <span style="color: #1E61A1;">Distribusion Solutions</span> <span style="color: #0D6EFD;">Customisation service</span>!
+        </h2>
+        <div class="text-start mt-2 mb-4">Explore the options below to find the perfect fit for your needs.</div>
         <div class="row align-items-start">
             <div class="col-md-4 d-flex flex-column text-center">
                 <button class="btn btn-outline-primary w-100 mb-3" data-purpose="standard-demo">
