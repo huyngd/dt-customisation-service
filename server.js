@@ -91,6 +91,7 @@ app.post('/save-selections', async (req, res) => {
     try {
         const {
             flowType,
+            briefRequest, // New field for brief request
             bespokeOption,
             agencyCounterInputs,
             landingPageSelection,
@@ -108,14 +109,17 @@ app.post('/save-selections', async (req, res) => {
 
         if (flowType === 'bespoke-demo') {
             insertData.bespoke_option = bespokeOption;
+            if (briefRequest) {
+                insertData.brief_request = briefRequest; // Save brief request only for bespoke-demo
+            }
             if (agencyCounterInputs) {
-                insertData.agency_counter_inputs = agencyCounterInputs; 
+                insertData.agency_counter_inputs = agencyCounterInputs;
             }
             insertData.landing_page_selection = landingPageSelection || null;
-            insertData.tailored_questions = tailoredQuestions || null; 
-            insertData.general_questions = generalQuestions || null; 
+            insertData.tailored_questions = tailoredQuestions || null;
+            insertData.general_questions = generalQuestions || null;
         } else if (flowType === 'update-config') {
-            insertData.update_page_details = updatePageDetails || null; 
+            insertData.update_page_details = updatePageDetails || null;
         }
 
         // Insert data into Supabase
@@ -142,6 +146,7 @@ app.post('/save-selections', async (req, res) => {
                   }
                 : null,
             landing_page_selection: row.landing_page_selection,
+            brief_request: flowType === 'bespoke-demo' ? row.brief_request || null : null,
             tailored_questions: typeof row.tailored_questions === 'string'
                 ? JSON.parse(row.tailored_questions)
                 : row.tailored_questions,
@@ -169,13 +174,14 @@ app.post('/save-selections', async (req, res) => {
         // Send Slack notification
         const slackMessage = `
 Flow Type: ${flowType}
+${flowType === 'bespoke-demo' ? `Brief Request: ${briefRequest || 'N/A'}` : ''}
 Bespoke Option: ${bespokeOption || 'N/A'}
         `;
         await sendSlackNotification(
             slackMessage,
             cleanedData,
             updatePageDetails?.contact || generalQuestions?.contact
-        );        
+        );
 
         res.status(200).json(cleanedData);
     } catch (error) {

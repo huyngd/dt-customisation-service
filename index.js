@@ -209,22 +209,32 @@ function renderPurposeSelection() {
     const container = document.getElementById('dynamicForm');
 
     container.innerHTML = `
-        <h3>Could you tell me what you're looking for?</h3>
-        <div class="row">
-            <div class="col-md-4">
-                <button class="btn btn-outline-primary w-100" data-purpose="standard-demo">
-                    A standard demo page for pitching
+        <h1>Welcome!</h1>
+        <div class="text-start mt-2 mb-4">Explore the options below to find the perfect white label solution for your needs.</div>
+        <div class="row align-items-start">
+            <div class="col-md-4 d-flex flex-column text-center">
+                <button class="btn btn-outline-primary w-100 mb-3" data-purpose="standard-demo">
+                    Ready-made pitch examples
                 </button>
+                <div>
+                    Ready-to-use pages tailored for specific integration and regions. These showcase all advanced functionalities that we're having, ensuring you're prepared for any use case in your meetings.
+                </div>
             </div>
-            <div class="col-md-4">
-                <button class="btn btn-outline-primary w-100" data-purpose="bespoke-demo">
+            <div class="col-md-4 d-flex flex-column text-center">
+                <button class="btn btn-outline-primary w-100 mb-3" data-purpose="bespoke-demo">
                     A bespoke demo page for pitching
                 </button>
+                <div>
+                    You’ve passed round 1 of the pitch and are ready to take it to the next level. For opportunities where a generic example won’t suffice, we’ll craft a bespoke white label demo to help you close the deal. Perfect for high-impact scenarios requiring tailored solutions—let’s make it count!
+                </div>
             </div>
-            <div class="col-md-4">
-                <button class="btn btn-outline-primary w-100" data-purpose="update-config">
-                    Changes of a production page
+            <div class="col-md-4 d-flex flex-column text-center">
+                <button class="btn btn-outline-primary w-100 mb-3" data-purpose="update-config">
+                    Demo readiness and production page adjustments
                 </button>
+                <div>
+                    Congratulations on your deal! Whether it’s a new case or an update to an existing solution, we’re here to help you deliver the most tailored and polished version of your offering to your customer.
+                </div>
             </div>
         </div>
     `;
@@ -559,13 +569,70 @@ function renderLandingPageSelection() {
     document.getElementById('nextButton').addEventListener('click', () => {
         if (selectedLandingPage) {
             flowData.landingPageSelection = selectedLandingPage;
-            renderTailoredQuestions(selectedLandingPage);
+            renderPreliminarySelection(selectedLandingPage);
         } else {
             alert('Please select a landing page.');
         }
     });
 
     document.getElementById('backButton').addEventListener('click', goBack);
+}
+
+function renderPreliminarySelection() {
+    historyStack.push(() => renderPreliminarySelection());
+    const container = document.getElementById('dynamicForm');
+
+    container.innerHTML = `
+        <h3>How would you like to specify your request?</h3>
+        <div class="row">
+            <div class="col-md-6 text-center">
+                <button class="btn btn-outline-primary w-100" id="trustUsButton">
+                    I’ll specify my request briefly and trust you for the rest
+                </button>
+            </div>
+            <div class="col-md-6 text-center">
+                <button class="btn btn-outline-primary w-100" id="pickFunctionalitiesButton">
+                    I’ll pick each functionality myself with confidence
+                </button>
+            </div>
+        </div>
+        <button class="btn btn-secondary mt-3" id="backButton">Back</button>
+    `;
+
+    // Event Listeners for Buttons
+    document.getElementById("trustUsButton").addEventListener("click", renderTrustUsInput);
+    document.getElementById("pickFunctionalitiesButton").addEventListener("click", renderTailoredQuestions);
+    document.getElementById("backButton").addEventListener("click", goBack);
+}
+
+function renderTrustUsInput() {
+    historyStack.push(() => renderTrustUsInput());
+    const container = document.getElementById('dynamicForm');
+
+    container.innerHTML = `
+        <h3>Briefly specify your request</h3>
+        <textarea id="briefRequest" class="form-control" rows="5" placeholder="Describe your request in your own words"></textarea>
+        <button class="btn btn-primary mt-3" id="submitTrustUsButton">Next</button>
+        <button class="btn btn-secondary mt-3" id="backButton">Back</button>
+    `;
+
+    // Event Listeners
+    document.getElementById("submitTrustUsButton").addEventListener("click", () => {
+        const briefRequest = document.getElementById("briefRequest").value.trim();
+
+        if (!briefRequest) {
+            alert("Please enter your request before proceeding.");
+            return;
+        }
+
+        // Save the brief request in flowData
+        flowData.briefRequest = briefRequest;
+
+        // Direct to General Questions
+        renderGeneralQuestions();
+    });
+
+    document.getElementById("backButton").addEventListener("click", goBack);
 }
 
 let tailoredQuestionsData = {};
@@ -823,6 +890,11 @@ function renderGeneralQuestions() {
             flowData.updatePageDetails = getUpdatePageDetails();
         }
 
+        // Add briefRequest to flowData if it exists
+        if (flowData.briefRequest) {
+            flowData.briefRequest = flowData.briefRequest;
+        }
+
         try {
             const apiUrl = 'https://wl-support.onrender.com'
             // const apiUrl = 'http://localhost:3000';
@@ -844,8 +916,9 @@ function renderGeneralQuestions() {
             console.error('Error during API call:', error);
             alert('Failed to save data. Check console for details.');
         }
-    });   
+    });
 }
+
 
 function goBack() {
     historyStack.pop();
@@ -913,12 +986,12 @@ function getTailoredQuestions() {
             ).map(input => input.value);
 
             acc[scenario.key] = selectedOptions.length > 0 ? selectedOptions : null;
-        } else {
+        } else if (scenario.options && scenario.options.length > 0) {
             // Collect single selected value for radio buttons
             const selectedRadio = document.querySelector(`input[name="scenario-${index}"]:checked`);
             if (selectedRadio) {
                 acc[scenario.key] = selectedRadio.value;
-            } else if (scenario.options.length > 1) {
+            } else {
                 console.warn(`No option selected for ${scenario.key}`);
             }
         }
@@ -935,6 +1008,7 @@ function getTailoredQuestions() {
     if (additionalNotes) {
         tailoredQuestions.additionalNotes = additionalNotes;
     }
+
     return tailoredQuestions;
 }
 
