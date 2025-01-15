@@ -48,6 +48,18 @@ const sendSlackNotification = async (message, data, email) => {
         const defaultUserTag = `<@U05CXS0QAH1>`; // Replace with the default user ID
         const channelId = 'C088BL697AT'; // Replace with your channel ID
 
+        if (specificUserId) {
+            try {
+                await slackClient.conversations.invite({
+                channel: channelId,
+                users: specificUserId,
+                });
+                console.log(`User <@${specificUserId}> added to the channel.`);
+            } catch (inviteError) {
+                console.error(`Error adding user <@${specificUserId}> to the channel:`, inviteError.message);
+            }
+            }
+        
         // Construct the notification message dynamically
         let slackText = `New Request Submitted by ${taggedUser}.\ncc: ${defaultUserTag}\n`;
 
