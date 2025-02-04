@@ -244,20 +244,42 @@ app.get('/get-flows', async (req, res) => {
         if (error) throw error;
 
         // Parse JSONB fields
-        const cleanedData = insertedData.map((row) => ({
+        const cleanedData = data.map((row) => ({
             id: row.id,
             flow_type: row.flow_type,
             bespoke_option: row.bespoke_option,
-            agency_counter_inputs: typeof row.agency_counter_inputs === 'string'
-                ? JSON.parse(row.agency_counter_inputs)
-                : row.agency_counter_inputs,
+            agency_counter_inputs: row.agency_counter_inputs
+                ? {
+                      ...row.agency_counter_inputs,
+                      users: row.agency_counter_inputs.users?.map((user) => ({
+                          firstName: user.firstName,
+                          lastName: user.lastName,
+                          email: user.email,
+                      })),
+                  }
+                : null,
             landing_page_selection: row.landing_page_selection,
+            brief_request: flowType === 'bespoke-demo' ? row.brief_request || null : null,
             tailored_questions: typeof row.tailored_questions === 'string'
                 ? JSON.parse(row.tailored_questions)
                 : row.tailored_questions,
-            general_questions: typeof row.general_questions === 'string'
-                ? JSON.parse(row.general_questions)
-                : row.general_questions,
+            general_questions: row.general_questions
+                ? {
+                      website: row.general_questions.website || "",
+                      rpn: row.general_questions.rpn || "no",
+                      rpnInput: row.general_questions.rpnInput || null,
+                      carriers: row.general_questions.carriers || "",
+                      additionalInfo: row.general_questions.additionalInfo || "",
+                      contact: row.general_questions.contact || "",
+                  }
+                : {
+                      website: "",
+                      rpn: "no",
+                      rpnInput: null,
+                      carriers: "",
+                      additionalInfo: "",
+                      contact: "",
+                  },
             update_page_details: row.update_page_details,
             submitted_at: row.submitted_at,
         }));        
