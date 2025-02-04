@@ -210,7 +210,7 @@ function renderPurposeSelection() {
 
     container.innerHTML = `
         <h2>
-    Welcome to <span style="color: #1E61A1;">Distribusion Solutions</span> <span style="color: #0D6EFD;">Customisation service</span>!
+    Welcome to <span style="color:rgb(10, 78, 179);">Distribusion Solutions</span> <span style="color: #0D6EFD;">Customisation service</span>!
         </h2>
         <div class="text-start mt-2 mb-4">Explore the options below to find the perfect fit for your needs.</div>
         <div class="row align-items-start">
@@ -510,8 +510,8 @@ function renderUpdateConfigurationForm() {
                 },
             };
             try {
-                const apiUrl = 'https://wl-support.onrender.com'
-                // const apiUrl = 'http://localhost:3000';
+                // const apiUrl = 'https://wl-support.onrender.com'
+                const apiUrl = 'http://localhost:3000';
 
                 const response = await fetch(`${apiUrl}/save-selections`, {
                     method: 'POST',
@@ -898,8 +898,8 @@ function renderGeneralQuestions() {
         }
 
         try {
-            const apiUrl = 'https://wl-support.onrender.com'
-            // const apiUrl = 'http://localhost:3000';
+            // const apiUrl = 'https://wl-support.onrender.com'
+            const apiUrl = 'http://localhost:3000';
 
             const response = await fetch(`${apiUrl}/save-selections`, {
                 method: 'POST',
@@ -1046,6 +1046,7 @@ function renderThankYouPage() {
         </div>
     `;
     document.getElementById('returnHome').addEventListener('click', () => {
+        flowData.agencyCounterInputs = null;
         renderPurposeSelection();
     });
 }

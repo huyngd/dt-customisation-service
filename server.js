@@ -103,7 +103,7 @@ app.post('/save-selections', async (req, res) => {
     try {
         const {
             flowType,
-            briefRequest, // New field for brief request
+            briefRequest,
             bespokeOption,
             agencyCounterInputs,
             landingPageSelection,
