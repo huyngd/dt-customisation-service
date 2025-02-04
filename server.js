@@ -259,7 +259,7 @@ app.get('/get-flows', async (req, res) => {
                   }
                 : null,
             landing_page_selection: row.landing_page_selection,
-            brief_request: flowType === 'bespoke-demo' ? row.brief_request || null : null,
+            brief_request: row.flowType === 'bespoke-demo' ? row.brief_request || null : null,
             tailored_questions: typeof row.tailored_questions === 'string'
                 ? JSON.parse(row.tailored_questions)
                 : row.tailored_questions,
