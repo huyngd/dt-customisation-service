@@ -510,8 +510,8 @@ function renderUpdateConfigurationForm() {
                 },
             };
             try {
-                // const apiUrl = 'https://wl-support.onrender.com'
-                const apiUrl = 'http://localhost:3000';
+                const apiUrl = 'https://wl-support.onrender.com'
+                // const apiUrl = 'http://localhost:3000';
 
                 const response = await fetch(`${apiUrl}/save-selections`, {
                     method: 'POST',
@@ -898,8 +898,8 @@ function renderGeneralQuestions() {
         }
 
         try {
-            // const apiUrl = 'https://wl-support.onrender.com'
-            const apiUrl = 'http://localhost:3000';
+            const apiUrl = 'https://wl-support.onrender.com'
+            // const apiUrl = 'http://localhost:3000';
 
             const response = await fetch(`${apiUrl}/save-selections`, {
                 method: 'POST',
