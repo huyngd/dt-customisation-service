@@ -46,7 +46,7 @@ const sendSlackNotification = async (message, data, email) => {
         const specificUserId = await findSlackUserIdByEmail(emailToUse);
         const taggedUser = specificUserId ? `<@${specificUserId}>` : emailToUse; // Use the email if user not found
         const defaultUserTag = `<@U05CXS0QAH1>`; // Replace with the default user ID
-        const channelId = 'C088BL697AT'; // Replace with your channel ID
+        const channelId = 'C08C3S84TV2'; // Replace with your channel ID
 
         if (specificUserId) {
             try {
